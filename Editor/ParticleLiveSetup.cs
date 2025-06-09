@@ -6,6 +6,7 @@ using UnityEditor;
 using System.IO;
 using System;
 using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
 namespace PaLASOLU
 {
@@ -72,14 +73,14 @@ namespace PaLASOLU
             if (File.Exists(assetPath + "_timeline.playable"))
             {
                 Debug.LogWarning("[PaLASOLU] 警告 : " + assetPath + "_timeline.playable ファイルは既に存在します。新しいファイルは作られません。");
-            }/*
+            }
             else
             {
-                var playable = ScriptableObject.CreateInstance<TimelineAsset>();                     //なぜか生成されない
-                Debug.Log("[PaLASOLU] テストログ " + (playable == null).ToString());    //Trueが帰る = playableがnullになってる
-                AssetDatabase.CreateAsset(playable, assetPath + "_timeline.playable");  //ArgumentNullExeption: Value cannot be null.
+                var playable = ScriptableObject.CreateInstance<TimelineAsset>();
+                Debug.Log("[PaLASOLU] テストログ " + (playable == null).ToString());
+                AssetDatabase.CreateAsset(playable, assetPath + "_timeline.playable");
                 Debug.Log("[PaLASOLU] ログ(正常) : " + assetPath + "_timeline.playable を作りました。");
-            }*/
+            }
 
             AssetDatabase.Refresh();
         }

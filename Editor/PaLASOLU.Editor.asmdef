@@ -2,7 +2,7 @@
     "name": "PaLASOLU.Editor",
     "rootNamespace": "",
     "references": [
-        "com.unity.timeline"
+        "Unity.Timeline"
     ],
     "includePlatforms": [
         "Editor"
