@@ -1,0 +1,23 @@
+{
+    "name" : "info.glintfraulein.palasolu",
+    "displayName" : "PaLASOLU - Particle Live Avatar Setup Optimization & Low-effort Uploader",
+    "version" : "0.0.1",
+    "unity" : "2022.3",
+    "description" : "Package for Particle Live Avatar",
+
+    "documentationUrl": "",
+    "changelogUrl": "",
+    "licensesUrl": "",
+    "license": "zlib",
+
+    "author": {
+      "name": "GlinT Fraulein"
+      "url" : "https://glintfraulein.info/PaLASOLU"
+    },
+    
+
+    "vpmDependencies" : {
+      "com.vrchat.avatars" : ">=3.8.0"
+      "nadena.dev.modular-avatar": "1.12.0"
+    }
+}
