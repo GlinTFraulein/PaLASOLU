@@ -5,6 +5,9 @@
     "unity" : "2022.3",
     "description" : "Particle Live Avatar Setup Optimization & Low-effort Uploader",
 
+    "url" : "https://github.com/GlinTFraulein/PaLASOLU/releases/download/0.1.0/info.glintfraulein.palasolu.0.1.0.zip?"
+    "repo" : "https://GlinTFraulein.github.io/vpm/index.json"
+
     "documentationUrl": "",
     "changelogUrl": "",
     "licensesUrl": "",
@@ -15,7 +18,6 @@
       "url" : "https://glintfraulein.info"
     },
     
-
     "vpmDependencies" : {
       "com.vrchat.avatars" : ">=3.8.0",
       "nadena.dev.modular-avatar": ">=1.12.0"
