@@ -1,14 +1,12 @@
 {
-    "name": "info.glintfraulein.palasolu.editor",
+    "name": "info.glintfraulein.palasolu.runtime",
     "rootNamespace": "",
     "references": [
         "Unity.Timeline",
         "nadena.dev.modular-avatar",
         "nadena.dev.ndmf"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
