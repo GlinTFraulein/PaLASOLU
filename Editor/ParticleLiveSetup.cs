@@ -1,10 +1,8 @@
 #if UNITY_EDITOR
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-using System;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
