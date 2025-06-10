@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 env:
-  packageName: "info.gilntfraulein.palasolu"
+  packageName: "info.glintfraulein.palasolu"
 
 jobs:
   build:
