@@ -11,13 +11,13 @@
     "license": "zlib",
 
     "author": {
-      "name": "GlinT Fraulein"
+      "name": "GlinT Fraulein",
       "url" : "https://glintfraulein.info"
     },
     
 
     "vpmDependencies" : {
-      "com.vrchat.avatars" : ">=3.8.0"
+      "com.vrchat.avatars" : ">=3.8.0",
       "nadena.dev.modular-avatar": ">=1.12.0"
     }
 }
