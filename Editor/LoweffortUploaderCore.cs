@@ -7,7 +7,8 @@ using UnityEditor.Animations;
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
-using GluonGui.WorkspaceWindow.Views.WorkspaceExplorer;
+using nadena.dev.ndmf.fluent;
+using UnityEngine.Playables;
 
 [assembly: ExportsPlugin(typeof(LoweffortUploaderCore))]
 
@@ -16,8 +17,15 @@ namespace PaLASOLU
     public class LoweffortUploaderCore : Plugin<LoweffortUploaderCore>
     {
         protected override void Configure()
-        {
-            InPhase(BuildPhase.Transforming).Run("PaLASOLU LfUploder Core Process", ctx =>
+        {/*
+            Sequence preProcess = InPhase(BuildPhase.Resolving);
+            preProcess.Run("PaLASOLU LfUploader Pre Process", ctx =>
+            {
+                Debug.Log("[PaLASOLU] testlog Resolving Process ");
+            });*/
+
+            Sequence coreProcess = InPhase(BuildPhase.Transforming);
+            coreProcess.Run("PaLASOLU LfUploder Core Process", ctx =>
             {
                 var obj = ctx.AvatarRootObject.GetComponentInChildren<PaLASOLU_LoweffortUploader>();
 
@@ -57,6 +65,15 @@ namespace PaLASOLU
 
                     
                     //Animator Setup
+                    AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>("Packages/info.glintfraulein.palasolu/Runtime/Animation/PaLASOLU_ParticleLiveAnimator.controller");
+                    obj.gameObject.GetComponent<Animator>().runtimeAnimatorController = controller;
+                    List<ChildAnimatorState> states = controller.layers[0].stateMachine.states.ToList();
+                    ChildAnimatorState childState = states.Find(s => s.state.name == "Recorded");
+                    AnimationClip recordedClip = recordedClips.FirstOrDefault(c => c.name == "Recorded");
+                    if (childState.state != null) childState.state.motion = recordedClip;
+
+                    /*
+                    //FUTURE WORK: Multi Animation/Animator Handling
                     foreach (var binding in bindings)
                     {
                         //Get Animator
@@ -86,11 +103,26 @@ namespace PaLASOLU
                             continue;
                         }
 
-                        
+                        /*
                         bool layerExists = controller.layers.Any(layer => layer.name == clipName);  //Object reference not set to an instance of an object
                         if (!layerExists)
                         {
                             //AddRecordedClipToAnimator(controller, clip, clipName);
+                        }
+                    }*/
+
+
+                    if (obj.director != null)
+                    {
+                        if (PrefabUtility.IsPartOfPrefabInstance(obj.director))
+                        {
+                            PrefabUtility.RecordPrefabInstancePropertyModifications(obj.director);
+                            Object.DestroyImmediate(obj.director, true);
+                            Debug.Log("[PaLASOLU] PlayableDirector Ç Prefab Ç©ÇÁçÌèúÇµÇ‹ÇµÇΩÅB");
+                        }
+                        else
+                        {
+                            Object.DestroyImmediate(obj.director);
                         }
                     }
 
