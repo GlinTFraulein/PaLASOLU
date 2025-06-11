@@ -10,7 +10,7 @@ namespace PaLASOLU
 {
     public class ParticleLiveSetup : EditorWindow
     {
-        const string basePrefabPath = "Packages/info.glintfraulein.palasolu//Runtime//Prefab/PaLASOLU_Prefab.prefab";
+        const string basePrefabPath = "Packages/info.glintfraulein.palasolu/Runtime/Prefab/PaLASOLU_Prefab.prefab";
         
         AudioClip particleLiveAudio = null;
         string rootFolderName = string.Empty;
@@ -62,17 +62,9 @@ namespace PaLASOLU
                 savePath = EditorUtility.OpenFolderPanel("Select Folder Directory", Application.dataPath, "ParticleLive");
                 savePath = Path.Combine(savePath, rootFolderName);
             }
-            
 
-            if (!Directory.Exists(savePath))
-            {
-                Directory.CreateDirectory(savePath);
-                Debug.Log("[PaLASOLU] ログ(正常) : " + savePath + "フォルダを作りました。");
-            }
-            else
-            {
-                Debug.LogWarning("[PaLASOLU] 警告 : " + savePath + "フォルダは既に存在します。新しいフォルダは作られません。");
-            }
+            CreateDirectory(savePath);
+            CreateDirectory(savePath + "/(PaLASOLU)");
 
             string timelinePath = Path.Combine(savePath, rootFolderName) + "_timeline.playable";
 
@@ -123,6 +115,22 @@ namespace PaLASOLU
                     AudioPlayableAsset audioAsset = audioClipOnTrack.asset as AudioPlayableAsset;
                     audioAsset.clip = particleLiveAudio;
                 }
+            }
+        }
+
+        bool CreateDirectory(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                Debug.LogWarning("[PaLASOLU] 警告 : " + path + "フォルダは既に存在します。新しいフォルダは作られません。");
+                return false;
+                
+            }
+            else
+            {
+                Directory.CreateDirectory(path);
+                Debug.Log("[PaLASOLU] ログ(正常) : " + path + "フォルダを作りました。");
+                return true;
             }
         }
 
