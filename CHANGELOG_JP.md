@@ -9,6 +9,7 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ### 追加
 - LowEffortUploaderの複数AnimationTrack対応
 - LowEffortUploaderのAudioTrack対応
+- UIをいい感じにしたり、ロゴデザインを作ったりする
 
 ### 修正
 
