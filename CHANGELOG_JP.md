@@ -11,9 +11,9 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - LowEffortUploaderのAudioTrack対応
 - UIをいい感じにしたり、ロゴデザインを作ったりする
 
-### 修正
-
 ### 変更
+
+### 修正
 
 ### 削除
 
@@ -21,6 +21,14 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 脆弱性
 
+## [0.2.1] - [2025-06-12]
+### 変更
+- Low-effort Uploaderのファイル名/クラス名変更(PaLASOLU_LoweffortUploader.cs => LowEffortUploader.cs)
+- Low-effort UploaderのInspector上の表示名を改善
+- Low-effort Uploaderは、アタッチしたタイミングで同GameObjectのPlayableDirectorを取得するようになりました
+
+### 修正
+- Setup OptimizationのSelect Folder Directoryが動かないバグを修正
 
 ## [0.2.0] - [2025-06-11]
 ### 追加

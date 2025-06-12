@@ -11,8 +11,6 @@ Playable Directorをつけたままでもパーティクルライブ付アバタ
 ## 既知の不具合
 
 ### Setup Optimization
-- 高度な設定を使った場合に正しくアセットが生成されない
-  - 高度な設定の使用を控えてください。なんでまだv0.2.0なので……
 
 ### Low-effort Uploader
 - Timelineが複数のAnimationTrackを使っている場合に正しくアップロードされない
@@ -22,7 +20,8 @@ Playable Directorをつけたままでもパーティクルライブ付アバタ
 
 
 (自分向け 更新手順)
-1. パッケージのコードを更新し、package.jsonのバージョン番号を変更（例：1.0.0→1.1.0）
-2. GitHub Actionsでリリースを行う
-3. ドラフトからリリースを生やす ここでタグも付ける
-4. template-package-listingのリポジトリのワークフローを実行
+1. package.jsonのバージョン番号を変更（例：1.0.0→1.1.0）
+2. CHANGELOG.mdを書く
+3. GitHub Actionsでリリースを行う
+4. ドラフトからリリースを生やす ここでタグも付ける
+5. template-package-listingのリポジトリのワークフローを実行
