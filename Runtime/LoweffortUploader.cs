@@ -5,20 +5,22 @@ using VRC.SDKBase;
 
 namespace PaLASOLU
 {
-    public class PaLASOLU_LoweffortUploader : MonoBehaviour, IEditorOnly
+    [AddComponentMenu("PaLASOLU/PaLASOLU Low-effort Uploader")]
+    [DisallowMultipleComponent]
+    public class LoweffortUploader : MonoBehaviour, IEditorOnly
     {
         public PlayableDirector director;
         public GameObject directorObject;
         
 #if UNITY_EDITOR
-        [CustomEditor(typeof(PaLASOLU_LoweffortUploader))]
+        [CustomEditor(typeof(LoweffortUploader))]
         public class LfUploaderEditor : Editor
         {
             bool advancedSettings = false;
 
             public override void OnInspectorGUI()
             {
-                PaLASOLU_LoweffortUploader uploader = (PaLASOLU_LoweffortUploader)target;
+                LoweffortUploader uploader = (LoweffortUploader)target;
                 EditorGUILayout.HelpBox("このスクリプトとPlayable Directorコンポーネントが同じGameObjectに付いている場合、適切な処理をしてアップロードを行います。", MessageType.Info);
 
                 if (advancedSettings = EditorGUILayout.Foldout(advancedSettings, "高度な設定"))
