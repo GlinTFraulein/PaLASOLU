@@ -27,7 +27,7 @@ namespace PaLASOLU
             Sequence coreProcess = InPhase(BuildPhase.Transforming);
             coreProcess.Run("PaLASOLU LfUploder Core Process", ctx =>
             {
-                var obj = ctx.AvatarRootObject.GetComponentInChildren<PaLASOLU_LoweffortUploader>();
+                var obj = ctx.AvatarRootObject.GetComponentInChildren<LoweffortUploader>();
 
                 if (obj != null)
                 {

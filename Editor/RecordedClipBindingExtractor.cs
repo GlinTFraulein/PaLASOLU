@@ -10,7 +10,6 @@ namespace PaLASOLU
 {
     public class RecordedClipBindingExtractor : EditorWindow
     {
-        [MenuItem("Tools/PaLASOLU/Export Timeline Clip Map")]
         public static void ExportRecordedClipBindings(PlayableDirector director)
         {
             if (director == null)
@@ -92,7 +91,7 @@ namespace PaLASOLU
             Debug.Log($"[PaLASOLU] Recorded Clip Bindings ÇèoóÕÇµÇ‹ÇµÇΩ: {outputPath}");
         }
 
-        private static string GetGameObjectPath(GameObject obj)
+        public static string GetGameObjectPath(GameObject obj)
         {
             string path = obj.name;
             Transform current = obj.transform;
