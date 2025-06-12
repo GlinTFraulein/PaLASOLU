@@ -1,6 +1,8 @@
 # PaLASOLU - Particle Live Avatar Setup Optimization & Low-effort Uploader
 for VRChat
 
+Readme : https://glintfraulein.info/docs/PaLASOLU
+
 ## Setup Optimization
 3クリック程度で、パーティクルライブ向けの設定済みPrefabを生成します。
 
