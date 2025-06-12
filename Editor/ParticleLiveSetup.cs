@@ -5,6 +5,7 @@ using UnityEditor;
 using System.IO;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
+using System.Text.RegularExpressions;
 
 namespace PaLASOLU
 {
@@ -61,6 +62,10 @@ namespace PaLASOLU
             {
                 savePath = EditorUtility.OpenFolderPanel("Select Folder Directory", Application.dataPath, "ParticleLive");
                 savePath = Path.Combine(savePath, rootFolderName);
+
+                //‘Š‘ÎƒpƒX•ÏŠ·
+                string[] spritPath = Regex.Split(savePath, "/Assets/");
+                savePath = "Assets/" + spritPath[1];
             }
 
             CreateDirectory(savePath);
