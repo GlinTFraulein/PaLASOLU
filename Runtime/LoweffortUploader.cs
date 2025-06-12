@@ -10,9 +10,17 @@ namespace PaLASOLU
     public class LoweffortUploader : MonoBehaviour, IEditorOnly
     {
         public PlayableDirector director;
-        public GameObject directorObject;
-        
+
 #if UNITY_EDITOR
+        private void Reset()
+        {
+            director = GetComponent<PlayableDirector>();
+            if (director == null)
+            {
+                Debug.LogWarning("[PaLASOLU] 警告 : Low-effort UploaderをアタッチしたGameObjectには、PlayableDirectorコンポーネントが存在しません！ 後から手動で追加する場合は、高度な設定から追加してください。");
+            }
+        }
+
         [CustomEditor(typeof(LoweffortUploader))]
         public class LfUploaderEditor : Editor
         {
