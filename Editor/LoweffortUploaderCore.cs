@@ -46,9 +46,11 @@ namespace PaLASOLU
                     }
 
                     var bindings = new Dictionary<string, string>();
+                    List<AnimationClip> playAudioClips = new List<AnimationClip>();
 
                     foreach (var track in timeline.GetOutputTracks())
                     {
+                        //Animation Handling Reserve
                         if (track is AnimationTrack)
                         {
                             AnimationTrack animationTrack = track as AnimationTrack;
@@ -66,41 +68,71 @@ namespace PaLASOLU
                         if (track is AudioTrack && obj.generateAudioObject)
                         {
                             List<TimelineClip> clips = track.GetClips().ToList();
-                            TimelineClip firstClip = clips.FirstOrDefault();
-                            AudioPlayableAsset audioPlayableAsset = firstClip?.asset as AudioPlayableAsset;
-                            AudioClip audioClip = audioPlayableAsset?.clip;
 
-                            if (audioClip == null)
+                            foreach (TimelineClip nowClip in clips)
                             {
-                                Debug.LogWarning("[PaLASOLU] 警告 : " + track.name + " にオーディオクリップが存在しません。");
-                                continue;
-                            }
+                                AudioPlayableAsset audioPlayableAsset = nowClip?.asset as AudioPlayableAsset;
+                                AudioClip audioClip = audioPlayableAsset?.clip;
 
-                            if (track.GetClips().Count() > 1)
-                            {
-                                Debug.LogWarning("[PaLASOLU] 警告 : " + track.name + " にオーディオクリップが複数存在します。オーディオソースの追加は、最初のクリップに対してのみ行われます。");
-                            }
-                            if (track.GetClips().FirstOrDefault().start != 0)
-                            {
-                                Debug.LogWarning("[PaLASOLU] 警告 : " + track.name + " は、再生開始タイミングが " + track.GetClips().FirstOrDefault().start + "秒です。現在のバージョンのPaLASOLUは、再生開始タイミングの変更に対応していないため、アップロードしたパーティクルライブの音声がズレることがあります。");
-                            }
+                                if (audioClip == null)
+                                {
+                                    Debug.LogWarning("[PaLASOLU] 警告 : " + nowClip.displayName + " にオーディオクリップが存在しません。");
+                                    continue;
+                                }
 
-                            
-                            GameObject audioObject = new GameObject(audioClip.name);
-                            audioObject.transform.parent = obj.transform;
-                            AudioSource audioSource = audioObject.AddComponent<AudioSource>();
-                            audioSource.clip = audioClip;
+                                string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
+                                string uniqueName = $"{audioClip.name}_{uniqueId}";
+                                GameObject audioObject = new GameObject(uniqueName);
+                                audioObject.transform.parent = obj.transform;
+                                audioObject.SetActive(false);
+
+                                AudioSource audioSource = audioObject.AddComponent<AudioSource>();
+                                audioSource.clip = audioClip;
+
+                                //AnimationClip Generate
+                                AnimationClip playAudioClip = new AnimationClip();
+                                playAudioClip.name = audioObject.name;
+
+                                EditorCurveBinding binding = new EditorCurveBinding();
+                                binding.path = audioObject.name;
+                                binding.type = typeof(GameObject);
+                                binding.propertyName = "m_IsActive";
+
+                                AnimationCurve curve = new AnimationCurve();
+                                Keyframe off = new Keyframe(0f, 0);
+                                off.outTangent = float.PositiveInfinity;
+                                Keyframe on = new((float)nowClip.start, 1);
+                                on.inTangent = float.PositiveInfinity;
+                                on.outTangent = float.PositiveInfinity;
+                                Keyframe off2 = new Keyframe((float)nowClip.end, 0);
+                                off2.inTangent = float.NegativeInfinity;
+
+                                if ((float)nowClip.start != 0f) curve.AddKey(off);
+                                curve.AddKey(on);
+                                curve.AddKey(off2);
+
+                                AnimationUtility.SetEditorCurve(playAudioClip, binding, curve);
+                                playAudioClip.legacy = false;
+
+                                playAudioClips.Add(playAudioClip);
+                            }
                         }
                     }
 
                     
                     //Animator Setup
-                    AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>("Packages/info.glintfraulein.palasolu/Runtime/Animation/PaLASOLU_ParticleLiveAnimator.controller");
+                    AnimatorController controller = new AnimatorController();
+                    controller.name = timeline.name;
                     obj.gameObject.GetComponent<Animator>().runtimeAnimatorController = controller;
-                    List<ChildAnimatorState> states = controller.layers[0].stateMachine.states.ToList();
-                    ChildAnimatorState childState = states.Find(s => s.state.name == "Recorded");
                     AnimationClip recordedClip = recordedClips.FirstOrDefault(c => c.name == "Recorded");
-                    if (childState.state != null) childState.state.motion = recordedClip;
+                    controller.AddLayer(SetupNewLayerAndState(recordedClip));
+
+                    //Animator Setup 2 (for AudioSource GameObjects)
+                    foreach (AnimationClip playAudioClip in playAudioClips)
+                    {
+                        if (playAudioClip == null) continue;
+                        controller.AddLayer(SetupNewLayerAndState(playAudioClip));
+                    }
 
                     /*
                     //FUTURE WORK: Multi Animation/Animator Handling
@@ -183,6 +215,29 @@ namespace PaLASOLU
             }
 
             return path;
+        }
+
+        public static Keyframe SetTangentIO(Keyframe keyframe)
+        {
+            keyframe.outTangent = float.PositiveInfinity;
+            keyframe.inTangent = float.PositiveInfinity;
+
+            return keyframe;
+        }
+
+        public static AnimatorControllerLayer SetupNewLayerAndState(AnimationClip addClip)
+        {
+            AnimatorControllerLayer newLayer = new AnimatorControllerLayer();
+            newLayer.name = addClip.name;
+            newLayer.defaultWeight = 1.0f;
+            newLayer.blendingMode = AnimatorLayerBlendingMode.Override;
+            newLayer.stateMachine = new AnimatorStateMachine();
+            newLayer.stateMachine.name = addClip.name;
+
+            AnimatorState newState = newLayer.stateMachine.AddState(addClip.name);
+            newState.motion = addClip;
+
+            return newLayer;
         }
 
     }
