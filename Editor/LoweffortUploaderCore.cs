@@ -70,27 +70,26 @@ namespace PaLASOLU
                             AudioPlayableAsset audioPlayableAsset = firstClip?.asset as AudioPlayableAsset;
                             AudioClip audioClip = audioPlayableAsset?.clip;
 
-                            if (track.GetClips().Count() > 1)
-                            {
-                                Debug.LogWarning("[PaLASOLU] 警告 : " + track.name + " にオーディオクリップが複数存在します。オーディオソースの追加は、最初のクリップに対してのみ行われます。");
-                            }
-                            if (track.GetClips().FirstOrDefault().clipIn != 0)
-                            {
-                                Debug.LogWarning("[PaLASOLU] 警告 : " + track.name + " は、再生開始タイミングが " + track.GetClips().FirstOrDefault().clipIn + "秒です。現在のバージョンのPaLASOLUは、再生開始タイミングの変更に対応していないため、アップロードしたパーティクルライブの音声がズレることがあります。");
-                            }
-
                             if (audioClip == null)
                             {
                                 Debug.LogWarning("[PaLASOLU] 警告 : " + track.name + " にオーディオクリップが存在しません。");
                                 continue;
                             }
-                            else
+
+                            if (track.GetClips().Count() > 1)
                             {
-                                GameObject audioObject = new GameObject(audioClip.name);
-                                audioObject.transform.parent = obj.transform;
-                                AudioSource audioSource = audioObject.AddComponent<AudioSource>();
-                                audioSource.clip = audioClip;
+                                Debug.LogWarning("[PaLASOLU] 警告 : " + track.name + " にオーディオクリップが複数存在します。オーディオソースの追加は、最初のクリップに対してのみ行われます。");
                             }
+                            if (track.GetClips().FirstOrDefault().start != 0)
+                            {
+                                Debug.LogWarning("[PaLASOLU] 警告 : " + track.name + " は、再生開始タイミングが " + track.GetClips().FirstOrDefault().start + "秒です。現在のバージョンのPaLASOLUは、再生開始タイミングの変更に対応していないため、アップロードしたパーティクルライブの音声がズレることがあります。");
+                            }
+
+                            
+                            GameObject audioObject = new GameObject(audioClip.name);
+                            audioObject.transform.parent = obj.transform;
+                            AudioSource audioSource = audioObject.AddComponent<AudioSource>();
+                            audioSource.clip = audioClip;
                         }
                     }
 
