@@ -8,18 +8,23 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 追加
 - LowEffortUploaderの複数AnimationTrack対応
-- LowEffortUploaderのAudioTrack完全対応 (Timeline上のオフセット、1AudioTrack上に複数AudioClipがある場合に対応する)
 - UIをいい感じにしたり、ロゴデザインを作ったりする
 
 ### 変更
 
 ### 修正
+- Low-effort UploaderがTimeline上のAudioClipの数だけLayerを生成する(優先度低)
 
 ### 削除
 
 ### 非推奨
 
 ### 脆弱性
+
+## [0.4.0] - [2025-06-14]
+### 追加
+- Low-Effort Uploaderは、AudioTrackを完全に正しくアップロードするようになりました。
+  - 現状は、AudioClipの数だけ新規にAnimatorLayerを生成します。これはパーティクルライブ用のAnimatorに対して生やしているのでアバター本体への影響はありませんが、レイヤーが増えまくるのは気持ち悪くはあるので、いつか修正するかもしれません。(修正する場合、オーディオ用の1Layerが全てのAudioClipに対応したAnimationを持つようにする予定です)
 
 ## [0.3.0] - [2025-06-13]
 ### 追加
