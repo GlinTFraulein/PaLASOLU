@@ -10,6 +10,7 @@ namespace PaLASOLU
     public class LoweffortUploader : MonoBehaviour, IEditorOnly
     {
         public PlayableDirector director;
+        public bool generateAudioObject = true;
 
 #if UNITY_EDITOR
         private void Reset()
@@ -34,6 +35,7 @@ namespace PaLASOLU
                 if (advancedSettings = EditorGUILayout.Foldout(advancedSettings, "çÇìxÇ»ê›íË"))
                 {
                     uploader.director = EditorGUILayout.ObjectField("PlayableDirector", uploader.director, typeof(PlayableDirector), true) as PlayableDirector;
+                    uploader.generateAudioObject = EditorGUILayout.Toggle("Generate Audio object", uploader.generateAudioObject);
                 }
 
                 if (GUI.changed)
