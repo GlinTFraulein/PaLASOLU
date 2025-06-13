@@ -8,7 +8,7 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 追加
 - LowEffortUploaderの複数AnimationTrack対応
-- LowEffortUploaderのAudioTrack対応
+- LowEffortUploaderのAudioTrack完全対応 (Timeline上のオフセット、1AudioTrack上に複数AudioClipがある場合に対応する)
 - UIをいい感じにしたり、ロゴデザインを作ったりする
 
 ### 変更
@@ -20,6 +20,13 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ### 非推奨
 
 ### 脆弱性
+
+## [0.3.0] - [2025-06-13]
+### 追加
+- Low-effort UploaderがAudioTrackのアップロードに暫定対応
+  - AudioTrackが単一のAudioを持ち、それがTimeline上で「0秒」の位置に配置されている場合にのみ正しく動作します。正しく動作しない場合、警告を出力します。
+  - AudioTrackが複数あっても、正しく動作します。(ただし、全てTimeline上で「0秒」の位置に配置されている場合にのみ正しく動作するため、音が重なると思います……。)
+  - PaLASOLU Low-effort Uploader コンポーネントの高度な設定から「Generate Audio Object」のチェックを外すことで、AudioTrackのアップロードをしないようにできます。
 
 ## [0.2.1] - [2025-06-12]
 ### 変更
