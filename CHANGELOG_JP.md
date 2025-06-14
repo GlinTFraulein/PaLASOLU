@@ -4,11 +4,14 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 この形式は [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) に基づいており、
 このプロジェクトは [Semantic Versioning](https://semver.org/lang/ja/) に従っています。
 
-## [Unreleased]
+## [Unreleased & Planned]
 
 ### 追加
-- LowEffortUploaderの複数AnimationTrack対応
 - UIをいい感じにしたり、ロゴデザインを作ったりする
+- TimelineExtension
+  - BPM基準でタイムラインを触れるようにする
+  - GameObjectの名称変更にAnimationが追従するようにする
+  - その他、Timelineを使いやすくする様々な機能
 
 ### 変更
 
@@ -20,6 +23,15 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ### 非推奨
 
 ### 脆弱性
+
+## [0.5.0] - [2025-06-14]
+### 追加
+- Low-effort Uploaderの複数AnimationTrack対応
+  - AnimationTrackに直接キーを打った場合にのみ対応しています(AnimationClipが配置された状況には未対応)
+
+### 修正
+- SetupOptimizationは"(PaLASOLU)"フォルダ歩生成しないように修正(使わないことが確定したので)
+- LICENCEファイルがなぜか.mdだったので修正
 
 ## [0.4.1] - [2025-06-14]
 ### 修正

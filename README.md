@@ -11,12 +11,7 @@ Playable Directorをつけたままでもパーティクルライブ付アバタ
 
 
 ## 既知の不具合
-
-### Setup Optimization
-
-### Low-effort Uploader
-- Timelineが複数のAnimationTrackを使っている場合に正しくアップロードされない
-  - 将来的に対応予定
+今のところないので、あったら教えてください！
 
 (自分向け 更新手順)
 1. package.jsonのバージョン番号を変更（例：1.0.0→1.1.0）
