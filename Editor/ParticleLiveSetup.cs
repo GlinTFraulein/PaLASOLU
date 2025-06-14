@@ -69,7 +69,6 @@ namespace PaLASOLU
             }
 
             CreateDirectory(savePath);
-            CreateDirectory(savePath + "/(PaLASOLU)");
 
             string timelinePath = Path.Combine(savePath, rootFolderName) + "_timeline.playable";
 
