@@ -21,6 +21,10 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 脆弱性
 
+## [0.4.1] - [2025-06-14]
+### 修正
+- Low-effort UploaderのNullチェックを強化し、PlayableDirectorもしくはTimelineAssetがNullだった場合に処理をスキップするように(PlayableDirectorが削除されないので、アップロードに失敗します)
+
 ## [0.4.0] - [2025-06-14]
 ### 追加
 - Low-Effort Uploaderは、AudioTrackを完全に正しくアップロードするようになりました。
