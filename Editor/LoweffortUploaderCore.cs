@@ -27,168 +27,179 @@ namespace PaLASOLU
             Sequence coreProcess = InPhase(BuildPhase.Transforming);
             coreProcess.Run("PaLASOLU LfUploder Core Process", ctx =>
             {
-                var obj = ctx.AvatarRootObject.GetComponentInChildren<LoweffortUploader>();
+                LoweffortUploader obj = ctx?.AvatarRootObject.GetComponentInChildren<LoweffortUploader>();
 
-                if (obj != null)
+                PlayableDirector director = obj?.director;
+                if (director == null)
                 {
-                    //RecordedClip Binding
-                    TimelineAsset timeline = obj.director.playableAsset as TimelineAsset;
-                    string timelinePath = AssetDatabase.GetAssetPath(timeline);
+                    Debug.LogError("[PaLASOLU] エラー : PaLASOLU Low-effort Uploader に PlayableDirector コンポーネントが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PaLASOLU Low-eoofrt Uploader コンポーネント内の、「高度な設定」から Playable Director がNoneでないことを確認してください。");
+                    return;
+                }
 
-                    Object[] subAssets = AssetDatabase.LoadAllAssetsAtPath(timelinePath);
-                    List<AnimationClip> recordedClips = new List<AnimationClip>();
-                    foreach (var asset in subAssets)
+                //RecordedClip Binding
+                TimelineAsset timeline = director?.playableAsset as TimelineAsset;
+                if (timeline == null)
+                {
+                    Debug.LogError("[PaLASOLU] エラー : PlayableDirector に Timeline Asset アセットが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PlayableDirector コンポーネント内の、 Playable が None でないことを確認してください。");
+                    return;
+                }
+
+                string timelinePath = AssetDatabase.GetAssetPath(timeline);
+
+                Object[] subAssets = AssetDatabase.LoadAllAssetsAtPath(timelinePath);
+                List<AnimationClip> recordedClips = new List<AnimationClip>();
+                foreach (var asset in subAssets)
+                {
+                    if (asset is AnimationClip clip && clip.name.StartsWith("Recorded"))
                     {
-                        if (asset is AnimationClip clip && clip.name.StartsWith("Recorded"))
-                        {
-                            recordedClips.Add(clip);
-                        }
+                        recordedClips.Add(clip);
+                    }
+                }
+
+                var bindings = new Dictionary<string, string>();
+                List<AnimationClip> playAudioClips = new List<AnimationClip>();
+
+                foreach (var track in timeline.GetOutputTracks())
+                {
+                    //Animation Handling Reserve
+                    if (track is AnimationTrack)
+                    {
+                        AnimationTrack animationTrack = track as AnimationTrack;
+                        var animator = director.GetGenericBinding(track) as Animator;
+                        if (animator == null) continue;
+
+                        var infiniteClip = animationTrack.infiniteClip;
+                        if (infiniteClip == null || !infiniteClip.name.StartsWith("Recorded")) continue;
+
+                        string animatorPath = GetGameObjectPath(animator.gameObject);
+                        bindings[infiniteClip.name] = animatorPath;
                     }
 
-                    var bindings = new Dictionary<string, string>();
-                    List<AnimationClip> playAudioClips = new List<AnimationClip>();
-
-                    foreach (var track in timeline.GetOutputTracks())
+                    //Audio Handling
+                    if (track is AudioTrack && obj.generateAudioObject)
                     {
-                        //Animation Handling Reserve
-                        if (track is AnimationTrack)
+                        List<TimelineClip> clips = track.GetClips().ToList();
+
+                        foreach (TimelineClip nowClip in clips)
                         {
-                            AnimationTrack animationTrack = track as AnimationTrack;
-                            var animator = obj.director.GetGenericBinding(track) as Animator;
-                            if (animator == null) continue;
+                            AudioPlayableAsset audioPlayableAsset = nowClip?.asset as AudioPlayableAsset;
+                            AudioClip audioClip = audioPlayableAsset?.clip;
 
-                            var infiniteClip = animationTrack.infiniteClip;
-                            if (infiniteClip == null || !infiniteClip.name.StartsWith("Recorded")) continue;
-
-                            string animatorPath = GetGameObjectPath(animator.gameObject);
-                            bindings[infiniteClip.name] = animatorPath;
-                        }
-
-                        //Audio Handling
-                        if (track is AudioTrack && obj.generateAudioObject)
-                        {
-                            List<TimelineClip> clips = track.GetClips().ToList();
-
-                            foreach (TimelineClip nowClip in clips)
+                            if (audioClip == null)
                             {
-                                AudioPlayableAsset audioPlayableAsset = nowClip?.asset as AudioPlayableAsset;
-                                AudioClip audioClip = audioPlayableAsset?.clip;
-
-                                if (audioClip == null)
-                                {
-                                    Debug.LogWarning("[PaLASOLU] 警告 : " + nowClip.displayName + " にオーディオクリップが存在しません。");
-                                    continue;
-                                }
-
-                                string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
-                                string uniqueName = $"{audioClip.name}_{uniqueId}";
-                                GameObject audioObject = new GameObject(uniqueName);
-                                audioObject.transform.parent = obj.transform;
-                                audioObject.SetActive(false);
-
-                                AudioSource audioSource = audioObject.AddComponent<AudioSource>();
-                                audioSource.clip = audioClip;
-
-                                //AnimationClip Generate
-                                AnimationClip playAudioClip = new AnimationClip();
-                                playAudioClip.name = audioObject.name;
-
-                                EditorCurveBinding binding = new EditorCurveBinding();
-                                binding.path = audioObject.name;
-                                binding.type = typeof(GameObject);
-                                binding.propertyName = "m_IsActive";
-
-                                AnimationCurve curve = new AnimationCurve();
-                                Keyframe off = new Keyframe(0f, 0);
-                                off.outTangent = float.PositiveInfinity;
-                                Keyframe on = new((float)nowClip.start, 1);
-                                on.inTangent = float.PositiveInfinity;
-                                on.outTangent = float.PositiveInfinity;
-                                Keyframe off2 = new Keyframe((float)nowClip.end, 0);
-                                off2.inTangent = float.NegativeInfinity;
-
-                                if ((float)nowClip.start != 0f) curve.AddKey(off);
-                                curve.AddKey(on);
-                                curve.AddKey(off2);
-
-                                AnimationUtility.SetEditorCurve(playAudioClip, binding, curve);
-                                playAudioClip.legacy = false;
-
-                                playAudioClips.Add(playAudioClip);
+                                Debug.LogWarning("[PaLASOLU] 警告 : " + nowClip.displayName + " にオーディオクリップが存在しません。");
+                                continue;
                             }
+
+                            string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
+                            string uniqueName = $"{audioClip.name}_{uniqueId}";
+                            GameObject audioObject = new GameObject(uniqueName);
+                            audioObject.transform.parent = obj.transform;
+                            audioObject.SetActive(false);
+
+                            AudioSource audioSource = audioObject.AddComponent<AudioSource>();
+                            audioSource.clip = audioClip;
+
+                            //AnimationClip Generate
+                            AnimationClip playAudioClip = new AnimationClip();
+                            playAudioClip.name = audioObject.name;
+
+                            EditorCurveBinding binding = new EditorCurveBinding();
+                            binding.path = audioObject.name;
+                            binding.type = typeof(GameObject);
+                            binding.propertyName = "m_IsActive";
+
+                            AnimationCurve curve = new AnimationCurve();
+                            Keyframe off = new Keyframe(0f, 0);
+                            off.outTangent = float.PositiveInfinity;
+                            Keyframe on = new((float)nowClip.start, 1);
+                            on.inTangent = float.PositiveInfinity;
+                            on.outTangent = float.PositiveInfinity;
+                            Keyframe off2 = new Keyframe((float)nowClip.end, 0);
+                            off2.inTangent = float.NegativeInfinity;
+
+                            if ((float)nowClip.start != 0f) curve.AddKey(off);
+                            curve.AddKey(on);
+                            curve.AddKey(off2);
+
+                            AnimationUtility.SetEditorCurve(playAudioClip, binding, curve);
+                            playAudioClip.legacy = false;
+
+                            playAudioClips.Add(playAudioClip);
                         }
                     }
+                }
 
-                    
-                    //Animator Setup
-                    AnimatorController controller = new AnimatorController();
-                    controller.name = timeline.name;
-                    obj.gameObject.GetComponent<Animator>().runtimeAnimatorController = controller;
-                    AnimationClip recordedClip = recordedClips.FirstOrDefault(c => c.name == "Recorded");
-                    controller.AddLayer(SetupNewLayerAndState(recordedClip));
 
-                    //Animator Setup 2 (for AudioSource GameObjects)
-                    foreach (AnimationClip playAudioClip in playAudioClips)
+                //Animator Setup
+                AnimatorController controller = new AnimatorController();
+                controller.name = timeline.name;
+                obj.gameObject.GetComponent<Animator>().runtimeAnimatorController = controller;
+                AnimationClip recordedClip = recordedClips.FirstOrDefault(c => c.name == "Recorded");
+                controller.AddLayer(SetupNewLayerAndState(recordedClip));
+
+                //Animator Setup 2 (for AudioSource GameObjects)
+                foreach (AnimationClip playAudioClip in playAudioClips)
+                {
+                    if (playAudioClip == null) continue;
+                    controller.AddLayer(SetupNewLayerAndState(playAudioClip));
+                }
+
+                /*
+                //FUTURE WORK: Multi Animation/Animator Handling
+                foreach (var binding in bindings)
+                {
+                    //Get Animator
+                    string clipName = binding.Key;
+                    string animatorPath = binding.Value;
+                    string relativeAnimatorPath = GetRelativePath(animatorPath, GetGameObjectPath(obj.gameObject));
+
+                    Transform animatorTransform = obj.transform.Find(relativeAnimatorPath == "." ? "" : relativeAnimatorPath);
+                    Animator animator = animatorTransform.GetComponent<Animator>();
+
+                    //Generate
+                    AnimatorController controller = animator.runtimeAnimatorController as AnimatorController;
+                    if (controller != null)
                     {
-                        if (playAudioClip == null) continue;
-                        controller.AddLayer(SetupNewLayerAndState(playAudioClip));
+                        string saveDir = Path.GetDirectoryName(AssetDatabase.GetAssetPath(timeline)) + "/(PaLASOLU)";
+                        Directory.CreateDirectory(saveDir);
+
+                        string controllerPath = saveDir + ($"{director.gameObject.name}.controller");
+                        controller = AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+                        animator.runtimeAnimatorController = controller;
+                    }
+
+                    AnimationClip clip = recordedClips.FirstOrDefault(c => c.name == clipName);  //前から名称一致で探している
+                    if (clip == null)
+                    {
+                        Debug.LogWarning($"[PaLASOLU] Recorded clipが見つかりません。: {clipName}");
+                        continue;
                     }
 
                     /*
-                    //FUTURE WORK: Multi Animation/Animator Handling
-                    foreach (var binding in bindings)
+                    bool layerExists = controller.layers.Any(layer => layer.name == clipName);  //Object reference not set to an instance of an object
+                    if (!layerExists)
                     {
-                        //Get Animator
-                        string clipName = binding.Key;
-                        string animatorPath = binding.Value;
-                        string relativeAnimatorPath = GetRelativePath(animatorPath, GetGameObjectPath(obj.gameObject));
-
-                        Transform animatorTransform = obj.transform.Find(relativeAnimatorPath == "." ? "" : relativeAnimatorPath);
-                        Animator animator = animatorTransform.GetComponent<Animator>();
-
-                        //Generate
-                        AnimatorController controller = animator.runtimeAnimatorController as AnimatorController;
-                        if (controller != null)
-                        {
-                            string saveDir = Path.GetDirectoryName(AssetDatabase.GetAssetPath(timeline)) + "/(PaLASOLU)";
-                            Directory.CreateDirectory(saveDir);
-
-                            string controllerPath = saveDir + ($"{obj.director.gameObject.name}.controller");
-                            controller = AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
-                            animator.runtimeAnimatorController = controller;
-                        }
-
-                        AnimationClip clip = recordedClips.FirstOrDefault(c => c.name == clipName);  //前から名称一致で探している
-                        if (clip == null)
-                        {
-                            Debug.LogWarning($"[PaLASOLU] Recorded clipが見つかりません。: {clipName}");
-                            continue;
-                        }
-
-                        /*
-                        bool layerExists = controller.layers.Any(layer => layer.name == clipName);  //Object reference not set to an instance of an object
-                        if (!layerExists)
-                        {
-                            //AddRecordedClipToAnimator(controller, clip, clipName);
-                        }
-                    }*/
-
-
-                    if (obj.director != null)
-                    {
-                        if (PrefabUtility.IsPartOfPrefabInstance(obj.director))
-                        {
-                            PrefabUtility.RecordPrefabInstancePropertyModifications(obj.director);
-                            Object.DestroyImmediate(obj.director, true);
-                            Debug.Log("[PaLASOLU] PlayableDirector を Prefab から削除しました。");
-                        }
-                        else
-                        {
-                            Object.DestroyImmediate(obj.director);
-                        }
+                        //AddRecordedClipToAnimator(controller, clip, clipName);
                     }
+                }*/
 
+
+                if (director != null)
+                {
+                    if (PrefabUtility.IsPartOfPrefabInstance(director))
+                    {
+                        PrefabUtility.RecordPrefabInstancePropertyModifications(director);
+                        Object.DestroyImmediate(director, true);
+                        Debug.Log("[PaLASOLU] PlayableDirector を Prefab から削除しました。");
+                    }
+                    else
+                    {
+                        Object.DestroyImmediate(director);
+                    }
                 }
+
+
             });
         }
 

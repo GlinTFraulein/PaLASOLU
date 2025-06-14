@@ -17,9 +17,6 @@ Playable Directorをつけたままでもパーティクルライブ付アバタ
 ### Low-effort Uploader
 - Timelineが複数のAnimationTrackを使っている場合に正しくアップロードされない
   - 将来的に対応予定
-- AudioTrackが「1トラックに対して1つのAudioClip」「AudioClipが0秒の位置に配置されている」以外の場合に正しく動作しない
-  - 将来的に対応予定
-
 
 (自分向け 更新手順)
 1. package.jsonのバージョン番号を変更（例：1.0.0→1.1.0）
