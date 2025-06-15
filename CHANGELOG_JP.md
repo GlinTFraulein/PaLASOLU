@@ -8,6 +8,8 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 追加
 - UIをいい感じにしたり、ロゴデザインを作ったりする
+- Animation, Audio以外のトラックに対応
+- AudioTrackの途中再生に対応 (できるのか？)
 - TimelineExtension
   - BPM基準でタイムラインを触れるようにする
   - GameObjectの名称変更にAnimationが追従するようにする
@@ -23,6 +25,15 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ### 非推奨
 
 ### 脆弱性
+
+## [0.6.0] - [2025-06-15]
+## 追加
+- Low-effort Uploaderに、AudioClipのLoad in Backgroundを修正する機能を追加
+- Low-effort Uploaderの将来的な拡張のために、AnimationEditExtensionを追加
+
+## 変更
+- Setup OptimizationのPrefabの内容を変更し、ワールド固定ボタンとギミック起動ボタンを分離
+- Low-effort Uploaderの中身を、AnimationEditExtensionに対応するように変更
 
 ## [0.5.0] - [2025-06-14]
 ### 追加
