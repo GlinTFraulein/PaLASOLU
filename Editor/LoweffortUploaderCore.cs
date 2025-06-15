@@ -1,14 +1,14 @@
-using UnityEngine;
-using nadena.dev.ndmf;
-using PaLASOLU;
-using UnityEngine.Timeline;
-using System.Linq;
-using UnityEditor.Animations;
-using UnityEditor;
-using System.IO;
 using System.Collections.Generic;
-using nadena.dev.ndmf.fluent;
+using System.Linq;
+using UnityEditor;
+using UnityEditor.Animations;
+using UnityEngine;
+using UnityEngine.Timeline;
 using UnityEngine.Playables;
+using nadena.dev.ndmf;
+using nadena.dev.ndmf.fluent;
+using PaLASOLU;
+
 
 [assembly: ExportsPlugin(typeof(LoweffortUploaderCore))]
 
@@ -104,6 +104,14 @@ namespace PaLASOLU
                                 continue;
                             }
 
+                            if (audioClip.loadInBackground == false)
+                            {
+                                string audioClipPath = AssetDatabase.GetAssetPath(audioClip);
+                                AudioImporter audioImporter = AssetImporter.GetAtPath(audioClipPath) as AudioImporter;
+                                audioImporter.loadInBackground = true;
+                                audioImporter.SaveAndReimport();
+                            }
+
                             string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
                             string uniqueName = $"{audioClip.name}_{uniqueId}";
                             GameObject audioObject = new GameObject(uniqueName);
@@ -123,17 +131,9 @@ namespace PaLASOLU
                             binding.propertyName = "m_IsActive";
 
                             AnimationCurve curve = new AnimationCurve();
-                            Keyframe off = new Keyframe(0f, 0);
-                            off.outTangent = float.PositiveInfinity;
-                            Keyframe on = new((float)nowClip.start, 1);
-                            on.inTangent = float.PositiveInfinity;
-                            on.outTangent = float.PositiveInfinity;
-                            Keyframe off2 = new Keyframe((float)nowClip.end, 0);
-                            off2.inTangent = float.NegativeInfinity;
-
-                            if ((float)nowClip.start != 0f) curve.AddKey(off);
-                            curve.AddKey(on);
-                            curve.AddKey(off2);
+                            if ((float)nowClip.start != 0f) curve.AddKeySetActive(0f, false);
+                            curve.AddKeySetActive((float)nowClip.start, true);
+                            curve.AddKeySetActive((float)nowClip.end, false);
 
                             AnimationUtility.SetEditorCurve(playAudioClip, binding, curve);
                             playAudioClip.legacy = false;
