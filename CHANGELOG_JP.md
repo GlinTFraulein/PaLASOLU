@@ -16,9 +16,10 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
   - その他、Timelineを使いやすくする様々な機能
 
 ### 変更
+- AudioClip.Create()を用いて、元のAudioClipのLoadInBackgroundを変更しないようにする
 
 ### 修正
-- Low-effort UploaderがTimeline上のAudioClipの数だけLayerを生成する(優先度低)
+- Low-effort UploaderがTimeline上のAudioClipの数だけLayerを生成する
 
 ### 削除
 
@@ -26,12 +27,21 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 脆弱性
 
+## [0.6.1] - [2025-06-17]
+### 変更
+- Setup Optimizationは、Timelineウィンドウを表示するように変更
+- TimelineウィンドウをLockするよう促すウィンドウが表示されるように変更
+
+### 追加(Internal)
+- LogMessageSimplifierを追加
+  - これは将来の拡張のために追加されており、現バージョンでは使用されていません！
+
 ## [0.6.0] - [2025-06-15]
-## 追加
+### 追加
 - Low-effort Uploaderに、AudioClipのLoad in Backgroundを修正する機能を追加
 - Low-effort Uploaderの将来的な拡張のために、AnimationEditExtensionを追加
 
-## 変更
+### 変更
 - Setup OptimizationのPrefabの内容を変更し、ワールド固定ボタンとギミック起動ボタンを分離
 - Low-effort Uploaderの中身を、AnimationEditExtensionに対応するように変更
 
