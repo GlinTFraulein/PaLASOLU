@@ -1,6 +1,8 @@
 #if UNITY_EDITOR
 
+using System;
 using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
@@ -120,6 +122,27 @@ namespace PaLASOLU
                     audioAsset.clip = particleLiveAudio;
                 }
             }
+
+            //Open Timeline window
+            //WARNING : Using Internal API!!
+            Type typeTimelineWindow = null;
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                typeTimelineWindow = asm.GetType("UnityEditor.Timeline.TimelineWindow");
+                if (typeTimelineWindow != null) break;
+            }
+
+            if (typeTimelineWindow == null)
+            {
+                Debug.LogWarning("[PaLASOLU] 警告 : TimelineWindow が見つかりませんでした。Timeline パッケージがロードされているか確認してください。");
+            }
+            else
+            {
+                var timelineWindow = EditorWindow.GetWindow(typeTimelineWindow, false);
+            }
+
+            Selection.activeGameObject = director.gameObject;
+            SetTimelineLock(true);
         }
 
         bool CreateDirectory(string path)
@@ -138,6 +161,59 @@ namespace PaLASOLU
             }
         }
 
+        //WARNING : Using Internal API!!
+        public static void SetTimelineLock(bool isLocked)
+        {
+            Type timelineWindowType = null;
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (asm.GetName().Name == "Unity.Timeline.Editor")
+                {
+                    timelineWindowType = asm.GetType("UnityEditor.Timeline.TimelineWindow");
+                    break;
+                }
+            }
+
+            if (timelineWindowType == null)
+            {
+                Debug.LogWarning("[PaLASOLU] (これを見つけたら作者 GlinTFraulein に報告！) InternalWarning : TimelineWindow type not found.");
+                return;
+            }
+
+            var timelineWindow = EditorWindow.GetWindow(timelineWindowType);
+            if (timelineWindow == null)
+            {
+                Debug.LogWarning("[PaLASOLU] (これを見つけたら作者 GlinTFraulein に報告！) InternalWarning : TimelineWindow instance not found.");
+                return;
+            }
+
+            var lockTrackerField = timelineWindowType.GetField("m_LockTracker", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (lockTrackerField == null)
+            {
+                Debug.LogWarning("[PaLASOLU] (これを見つけたら作者 GlinTFraulein に報告！) InternalWarning : m_LockTracker field not found.");
+                return;
+            }
+
+            var lockTracker = lockTrackerField.GetValue(timelineWindow);
+            if (lockTracker == null)
+            {
+                Debug.LogWarning("[PaLASOLU] (これを見つけたら作者 GlinTFraulein に報告！) InternalWarning : LockTracker is null.");
+                return;
+            }
+
+            var lockTrackerType = lockTracker.GetType();
+            var isLockedField = lockTrackerType.GetField("m_IsLocked", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (isLockedField == null)
+            {
+                Debug.LogWarning("[PaLASOLU] (これを見つけたら作者 GlinTFraulein に報告！) InternalWarning : m_IsLocked field not found.");
+                return;
+            }
+
+            isLockedField.SetValue(lockTracker, isLocked);
+            timelineWindow.Repaint();  // ついでに更新を促す
+
+            Debug.Log("[PaLASOLU] ログ: Timelineウィンドウをロックしました。");
+        }
     }
 }
 #endif

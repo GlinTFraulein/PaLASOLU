@@ -3,6 +3,7 @@
     "rootNamespace": "",
     "references": [
         "Unity.Timeline",
+        "Unity.Timeline.Editor",
         "nadena.dev.modular-avatar",
         "nadena.dev.ndmf",
         "info.glintfraulein.palasolu.runtime"
