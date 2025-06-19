@@ -15,7 +15,8 @@ namespace PaLASOLU
     public class ParticleLiveSetup : EditorWindow
     {
         const string basePrefabPath = "Packages/info.glintfraulein.palasolu/Runtime/Prefab/PaLASOLU_Prefab.prefab";
-        
+        const string bannerPath = "Packages/info.glintfraulein.palasolu//Image/PaLASOLU_Banner.png";
+
         AudioClip particleLiveAudio = null;
         string rootFolderName = string.Empty;
         bool IsShowAdvancedSettings = false;
@@ -23,16 +24,35 @@ namespace PaLASOLU
         bool moveAudioClip = false;
         bool existTimeline = false;
         bool timelineLockNotice = true;
+        static Texture banner = null;
 
         [MenuItem("Tools/PaLASOLU/ParticleLive Setup")]
         static void Init()
         {
             ParticleLiveSetup window = (ParticleLiveSetup)GetWindow(typeof(ParticleLiveSetup));
+            banner = AssetDatabase.LoadAssetAtPath<Texture>(bannerPath);
+            window.titleContent = new GUIContent("Particle Live Setup");
             window.Show();
         }
 
         private void OnGUI()
         {
+            GUILayout.Space(4);
+
+            float windowWidth = position.width;
+            float maxWidth = 1024f;
+            float displayWidth = Mathf.Min(windowWidth - 10f, maxWidth);
+
+            float aspect = (float)banner.height / banner.width;
+            float displayHeight = displayWidth * aspect;
+
+            float xOffset = (windowWidth - displayWidth) * 0.5f;
+            Rect bannerRect = new Rect(xOffset, GUILayoutUtility.GetRect(0, displayHeight).y, displayWidth, displayHeight);
+            
+            GUI.DrawTexture(bannerRect, banner, ScaleMode.ScaleToFit);
+
+            GUILayout.Space(8);
+
             GUILayout.Label("パーティクルライブ用フォルダの新規作成", EditorStyles.boldLabel);
             rootFolderName = EditorGUILayout.TextField("フォルダ名(楽曲名を推奨)", rootFolderName);
             particleLiveAudio = EditorGUILayout.ObjectField("楽曲ファイル(なくても可)", particleLiveAudio, typeof(AudioClip), false) as AudioClip;
@@ -52,9 +72,9 @@ namespace PaLASOLU
             if (IsShowAdvancedSettings)
             {
                 EditorGUI.indentLevel = 1;
-                selectFolder = EditorGUILayout.Toggle("Select Folder Directory", selectFolder);
-                moveAudioClip = EditorGUILayout.Toggle("Move AudioClip File to Particle Live Directory", moveAudioClip);
-                timelineLockNotice = EditorGUILayout.Toggle("Timeline Lock Notice", timelineLockNotice);
+                selectFolder = DrawResponsiveToggle("Select Folder Directory", selectFolder);
+                moveAudioClip = DrawResponsiveToggle("Move AudioClip File to Particle Live Directory", moveAudioClip);
+                timelineLockNotice = DrawResponsiveToggle("Timeline Lock Notice", timelineLockNotice);
             }
         }
 
@@ -171,6 +191,26 @@ namespace PaLASOLU
                 return true;
             }
         }
+
+        bool DrawResponsiveToggle(string label, bool value)
+        {
+            float toggleWidth = 18f;
+            float indentPerLevel = 8f;
+
+            float viewWidth = EditorGUIUtility.currentViewWidth;
+
+            float indentOffset = EditorGUI.indentLevel * indentPerLevel;
+
+            Rect fullRect = GUILayoutUtility.GetRect(0, EditorGUIUtility.singleLineHeight);
+            Rect labelRect = new Rect(fullRect.x + indentOffset, fullRect.y, fullRect.width - toggleWidth - indentOffset, fullRect.height);
+            Rect toggleRect = new Rect(fullRect.xMax - toggleWidth, fullRect.y, toggleWidth, fullRect.height);
+
+            GUI.Label(labelRect, label);
+            value = GUI.Toggle(toggleRect, value, GUIContent.none);
+
+            return value;
+        }
+
 
     }
 }
