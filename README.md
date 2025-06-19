@@ -1,5 +1,5 @@
 # PaLASOLU - Particle Live Avatar Setup Optimization & Low-effort Uploader
-[PaLASOLU](Image/PaLASOLU_Banner.png)
+![PaLASOLU](Image/PaLASOLU_Banner.png)
 
 for VRChat Avatar Particle Live!
 
