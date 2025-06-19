@@ -7,7 +7,6 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 
 ### 追加
-- UIをいい感じにする
 - Animation, Audio以外のトラックに対応
 - AudioTrackの途中再生に対応 (できるのか？)
 - TimelineExtension
@@ -15,6 +14,8 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
   - GameObjectの名称変更にAnimationが追従するようにする
   - 「0打ち」をしなくていいようにする
   - その他、Timelineを使いやすくする様々な機能
+- Timelineチュートリアル
+- サンプルPrefabを置けるようにする
 
 ### 変更
 - AudioClip.Create()を用いて、元のAudioClipのLoadInBackgroundを変更しないようにする
@@ -27,6 +28,17 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ### 非推奨
 
 ### 脆弱性
+
+## [1.0.0] - [2025-06-19]
+### 重大
+- Major Versionを1に上げ、正式リリースを発表
+
+### 追加
+- Setup Optimization, Low-effort Uploaderにバナーを追加
+
+### 修正
+- Setup OptimizationのUI表示を改善
+- package.jsonで指定するVRCSDKのバージョンを3.8.1以上に修正 (3.8.0はBuild & Publishが押せなかったため)
 
 ## [0.7.0] - [2025-06-18]
 ### 追加
