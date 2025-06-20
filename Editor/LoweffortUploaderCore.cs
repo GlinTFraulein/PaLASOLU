@@ -33,6 +33,11 @@ namespace PaLASOLU
             preProcess.Run("PaLASOLU LfUploader Pre Process", ctx =>
             {
                 obj = ctx?.AvatarRootObject.GetComponentInChildren<LoweffortUploader>();
+                if (obj == null)
+                {
+                    Debug.Log("[PaLASOLU] ƒƒO : PaLASOLU Low-effort Uploader‚ª‘¶Ý‚µ‚Ü‚¹‚ñB");
+                    return;
+                }
 
                 director = obj?.director;
                 if (director == null)
@@ -86,6 +91,8 @@ namespace PaLASOLU
             Sequence coreProcess = InPhase(BuildPhase.Transforming);
             coreProcess.Run("PaLASOLU LfUploder Core Process", ctx =>
             {
+                if (obj == null) return;
+
                 foreach (var track in timeline.GetOutputTracks())
                 {
                     //Audio Handling
