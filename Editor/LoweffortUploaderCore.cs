@@ -20,8 +20,6 @@ namespace PaLASOLU
 
         public PlayableDirector director;
         public TimelineAsset timeline;
-        public string timelinePath;
-        public Object[] subAssets;
         public List<AnimationClip> recordedClips;
         public Dictionary<string, string> bindings;
         public List<AnimationClip> playAudioClips;
@@ -29,17 +27,6 @@ namespace PaLASOLU
 
     public class LoweffortUploaderCore : Plugin<LoweffortUploaderCore>
     {
-        /*
-        LoweffortUploader obj;
-        PlayableDirector director;
-        TimelineAsset timeline;
-        string timelinePath;
-        Object[] subAssets;
-        List<AnimationClip> recordedClips;
-        Dictionary<string, string> bindings;
-        List<AnimationClip> playAudioClips;
-        */
-
         protected override void Configure()
         {
             Sequence preProcess = InPhase(BuildPhase.Resolving);
@@ -58,7 +45,8 @@ namespace PaLASOLU
                     return;
                 }
 
-                PlayableDirector director = obj?.director;
+                lfuState.director = obj?.director;
+                PlayableDirector director = lfuState.director;
                 if (director == null)
                 {
                     Debug.LogError("[PaLASOLU] エラー : PaLASOLU Low-effort Uploader に PlayableDirector コンポーネントが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PaLASOLU Low-eoofrt Uploader コンポーネント内の、「高度な設定」から Playable Director がNoneでないことを確認してください。");
@@ -77,7 +65,8 @@ namespace PaLASOLU
                 //"Recorded" clips extraction
                 string timelinePath = AssetDatabase.GetAssetPath(timeline);
                 Object[] subAssets = AssetDatabase.LoadAllAssetsAtPath(timelinePath);
-                List<AnimationClip> recordedClips = new List<AnimationClip>();
+                lfuState.recordedClips = new List<AnimationClip>();
+                List<AnimationClip> recordedClips = lfuState.recordedClips;
                 foreach (var asset in subAssets)
                 {
                     if (asset is AnimationClip clip && clip.name.StartsWith("Recorded"))
@@ -87,8 +76,10 @@ namespace PaLASOLU
                 }
 
                 //Animation Handling
-                Dictionary<string, string> bindings = new Dictionary<string, string>();
-                List<AnimationClip> playAudioClips = new List<AnimationClip>();
+                lfuState.bindings = new Dictionary<string, string>();
+                Dictionary<string, string> bindings = lfuState.bindings;
+                lfuState.playAudioClips = new List<AnimationClip>();
+                List<AnimationClip> playAudioClips = lfuState.playAudioClips;
 
                 foreach (var track in timeline.GetOutputTracks())
                 {
