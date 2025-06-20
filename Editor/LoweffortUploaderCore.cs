@@ -18,7 +18,6 @@ namespace PaLASOLU
     {
         public LoweffortUploader lfUploader { get; set; }
 
-        public LoweffortUploader obj;
         public PlayableDirector director;
         public TimelineAsset timeline;
         public string timelinePath;
@@ -47,17 +46,19 @@ namespace PaLASOLU
             preProcess.BeforePlugin("nadena.dev.modular-avatar");
             preProcess.Run("PaLASOLU LfUploader Pre Process", ctx =>
             {
-                ctx.GetState<LoweffortUploaderState>().lfUploader = ctx?.AvatarRootObject.GetComponentInChildren<LoweffortUploader>(true);
                 LoweffortUploaderState lfuState = ctx.GetState<LoweffortUploaderState>();
+                lfuState.lfUploader = ctx?.AvatarRootObject.GetComponentInChildren<LoweffortUploader>(true);
+                
 
-                lfuState.obj = ctx?.AvatarRootObject.GetComponentInChildren<LoweffortUploader>();
+                LoweffortUploader obj = lfuState.lfUploader;
+                
                 if (obj == null)
                 {
                     Debug.Log("[PaLASOLU] ログ : PaLASOLU Low-effort Uploaderが存在しません。");
                     return;
                 }
 
-                director = obj?.director;
+                PlayableDirector director = obj?.director;
                 if (director == null)
                 {
                     Debug.LogError("[PaLASOLU] エラー : PaLASOLU Low-effort Uploader に PlayableDirector コンポーネントが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PaLASOLU Low-eoofrt Uploader コンポーネント内の、「高度な設定」から Playable Director がNoneでないことを確認してください。");
@@ -65,7 +66,8 @@ namespace PaLASOLU
                 }
 
                 //RecordedClip Binding
-                timeline = director?.playableAsset as TimelineAsset;
+                lfuState.timeline = director?.playableAsset as TimelineAsset;
+                TimelineAsset timeline = lfuState.timeline;
                 if (timeline == null)
                 {
                     Debug.LogError("[PaLASOLU] エラー : PlayableDirector に Timeline Asset アセットが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PlayableDirector コンポーネント内の、 Playable が None でないことを確認してください。");
@@ -73,9 +75,9 @@ namespace PaLASOLU
                 }
 
                 //"Recorded" clips extraction
-                timelinePath = AssetDatabase.GetAssetPath(timeline);
-                subAssets = AssetDatabase.LoadAllAssetsAtPath(timelinePath);
-                recordedClips = new List<AnimationClip>();
+                string timelinePath = AssetDatabase.GetAssetPath(timeline);
+                Object[] subAssets = AssetDatabase.LoadAllAssetsAtPath(timelinePath);
+                List<AnimationClip> recordedClips = new List<AnimationClip>();
                 foreach (var asset in subAssets)
                 {
                     if (asset is AnimationClip clip && clip.name.StartsWith("Recorded"))
@@ -85,8 +87,8 @@ namespace PaLASOLU
                 }
 
                 //Animation Handling
-                bindings = new Dictionary<string, string>();
-                playAudioClips = new List<AnimationClip>();
+                Dictionary<string, string> bindings = new Dictionary<string, string>();
+                List<AnimationClip> playAudioClips = new List<AnimationClip>();
 
                 foreach (var track in timeline.GetOutputTracks())
                 {
@@ -109,9 +111,12 @@ namespace PaLASOLU
             Sequence coreProcess = InPhase(BuildPhase.Transforming);
             coreProcess.Run("PaLASOLU LfUploder Core Process", ctx =>
             {
-                if (obj == null) return;
+                LoweffortUploaderState lfuState = ctx.GetState<LoweffortUploaderState>();
+                if (lfuState.lfUploader == null) return;
 
-                foreach (var track in timeline.GetOutputTracks())
+                LoweffortUploader obj = lfuState.lfUploader;
+
+                foreach (var track in lfuState.timeline.GetOutputTracks())
                 {
                     //Audio Handling
                     if (track is AudioTrack && obj.generateAudioObject)
@@ -163,12 +168,14 @@ namespace PaLASOLU
                             AnimationUtility.SetEditorCurve(playAudioClip, binding, curve);
                             playAudioClip.legacy = false;
 
-                            playAudioClips.Add(playAudioClip);
+                            lfuState.playAudioClips.Add(playAudioClip);
                         }
                     }
                 }
-                
+
                 //Animator Setup (for AnimationClips)
+                Dictionary<string, string> bindings = lfuState.bindings;
+
                 foreach (var binding in bindings)
                 {
                     //Get Animator
@@ -186,7 +193,7 @@ namespace PaLASOLU
                         animator.runtimeAnimatorController = controller;
                     }
 
-                    AnimationClip clip = recordedClips.FirstOrDefault(c => c.name == clipName);  //前から名称一致で探している
+                    AnimationClip clip = lfuState.recordedClips.FirstOrDefault(c => c.name == clipName);  //前から名称一致で探している
                     if (clip == null)
                     {
                         Debug.LogWarning($"[PaLASOLU] Recorded clipが見つかりません。: {clipName}");
@@ -213,13 +220,15 @@ namespace PaLASOLU
                     rootAnimator.runtimeAnimatorController = rootController;
                 }
 
-                foreach (AnimationClip playAudioClip in playAudioClips)
+                foreach (AnimationClip playAudioClip in lfuState.playAudioClips)
                 {
                     if (playAudioClip == null) continue;
                     rootController.AddLayer(SetupNewLayerAndState(playAudioClip));
                 }
 
                 //PlayableDirector Delete
+                PlayableDirector director = lfuState.director;
+
                 if (director != null)
                 {
                     if (PrefabUtility.IsPartOfPrefabInstance(director))
