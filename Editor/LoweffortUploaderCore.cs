@@ -14,8 +14,23 @@ using PaLASOLU;
 
 namespace PaLASOLU
 {
+    internal class LoweffortUploaderState
+    {
+        public LoweffortUploader lfUploader { get; set; }
+
+        public LoweffortUploader obj;
+        public PlayableDirector director;
+        public TimelineAsset timeline;
+        public string timelinePath;
+        public Object[] subAssets;
+        public List<AnimationClip> recordedClips;
+        public Dictionary<string, string> bindings;
+        public List<AnimationClip> playAudioClips;
+    }
+
     public class LoweffortUploaderCore : Plugin<LoweffortUploaderCore>
     {
+        /*
         LoweffortUploader obj;
         PlayableDirector director;
         TimelineAsset timeline;
@@ -24,7 +39,7 @@ namespace PaLASOLU
         List<AnimationClip> recordedClips;
         Dictionary<string, string> bindings;
         List<AnimationClip> playAudioClips;
-
+        */
 
         protected override void Configure()
         {
@@ -32,7 +47,10 @@ namespace PaLASOLU
             preProcess.BeforePlugin("nadena.dev.modular-avatar");
             preProcess.Run("PaLASOLU LfUploader Pre Process", ctx =>
             {
-                obj = ctx?.AvatarRootObject.GetComponentInChildren<LoweffortUploader>();
+                ctx.GetState<LoweffortUploaderState>().lfUploader = ctx?.AvatarRootObject.GetComponentInChildren<LoweffortUploader>(true);
+                LoweffortUploaderState lfuState = ctx.GetState<LoweffortUploaderState>();
+
+                lfuState.obj = ctx?.AvatarRootObject.GetComponentInChildren<LoweffortUploader>();
                 if (obj == null)
                 {
                     Debug.Log("[PaLASOLU] ÉçÉO : PaLASOLU Low-effort UploaderÇ™ë∂ç›ÇµÇ‹ÇπÇÒÅB");
