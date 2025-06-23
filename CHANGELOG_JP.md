@@ -16,6 +16,7 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
   - その他、Timelineを使いやすくする様々な機能
 - Timelineチュートリアル
 - サンプルPrefabを置けるようにする
+- MeshCollider削除
 
 ### 変更
 - AudioClip.Create()を用いて、元のAudioClipのLoadInBackgroundを変更しないようにする
@@ -28,6 +29,11 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ### 非推奨
 
 ### 脆弱性
+
+## [1.0.2] - [2025-06-24]
+### 修正
+- Low-effort Uploader CoreProcessのNullチェックを強化
+- 日本語でTimelineを作った場合にTimelineAssetのAnimationClipの名称が"Recorded"でない問題への暫定対応
 
 ## [1.0.1] - [2025-06-21]
 ### 修正
