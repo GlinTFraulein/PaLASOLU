@@ -105,7 +105,7 @@ namespace PaLASOLU
                 LoweffortUploaderState lfuState = ctx.GetState<LoweffortUploaderState>();
                 if (lfuState.lfUploader == null) return;
 
-                LoweffortUploader obj = lfuState.lfUploader;
+                LoweffortUploader obj = lfuState?.lfUploader;
                 if (obj == null) return;
 
                 foreach (var track in lfuState.timeline.GetOutputTracks())
