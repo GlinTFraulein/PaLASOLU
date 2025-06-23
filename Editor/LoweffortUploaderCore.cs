@@ -90,7 +90,7 @@ namespace PaLASOLU
                         if (animator == null) continue;
 
                         var infiniteClip = animationTrack.infiniteClip;
-                        if (infiniteClip == null || !infiniteClip.name.StartsWith("Recorded")) continue;
+                        if (infiniteClip == null /*|| !infiniteClip.name.StartsWith("Recorded")*/) continue;
 
                         //animatorPath‚Íobj.gameObject‚©‚ç‚Ì‘Š‘ÎƒpƒX‚ðŽæ‚é
                         string animatorPath = GetRelativePath(GetGameObjectPath(animator.gameObject), GetGameObjectPath(obj.gameObject));
@@ -106,6 +106,7 @@ namespace PaLASOLU
                 if (lfuState.lfUploader == null) return;
 
                 LoweffortUploader obj = lfuState.lfUploader;
+                if (obj == null) return;
 
                 foreach (var track in lfuState.timeline.GetOutputTracks())
                 {
