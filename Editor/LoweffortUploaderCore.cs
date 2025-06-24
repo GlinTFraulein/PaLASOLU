@@ -9,7 +9,6 @@ using nadena.dev.ndmf;
 using nadena.dev.ndmf.fluent;
 using PaLASOLU;
 
-
 [assembly: ExportsPlugin(typeof(LoweffortUploaderCore))]
 
 namespace PaLASOLU
@@ -69,7 +68,7 @@ namespace PaLASOLU
                 List<AnimationClip> recordedClips = lfuState.recordedClips;
                 foreach (var asset in subAssets)
                 {
-                    if (asset is AnimationClip clip && clip.name.StartsWith("Recorded"))
+                    if (asset is AnimationClip clip /*&& clip.name.StartsWith("Recorded")*/)
                     {
                         recordedClips.Add(clip);
                     }
@@ -108,6 +107,9 @@ namespace PaLASOLU
                 LoweffortUploader obj = lfuState?.lfUploader;
                 if (obj == null) return;
 
+                AnimationClip margedAudioClip = new AnimationClip();
+                margedAudioClip.name = "margedAudioClip";
+
                 foreach (var track in lfuState.timeline.GetOutputTracks())
                 {
                     //Audio Handling
@@ -144,9 +146,6 @@ namespace PaLASOLU
                             audioSource.clip = audioClip;
 
                             //AnimationClip Generate
-                            AnimationClip playAudioClip = new AnimationClip();
-                            playAudioClip.name = audioObject.name;
-
                             EditorCurveBinding binding = new EditorCurveBinding();
                             binding.path = audioObject.name;
                             binding.type = typeof(GameObject);
@@ -157,13 +156,13 @@ namespace PaLASOLU
                             curve.AddKeySetActive((float)nowClip.start, true);
                             curve.AddKeySetActive((float)nowClip.end, false);
 
-                            AnimationUtility.SetEditorCurve(playAudioClip, binding, curve);
-                            playAudioClip.legacy = false;
-
-                            lfuState.playAudioClips.Add(playAudioClip);
+                            AnimationUtility.SetEditorCurve(margedAudioClip, binding, curve);
+                            margedAudioClip.legacy = false;
                         }
                     }
                 }
+
+                lfuState.playAudioClips.Add(margedAudioClip);
 
                 //Animator Setup (for AnimationClips)
                 Dictionary<string, string> bindings = lfuState.bindings;
