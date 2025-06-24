@@ -22,13 +22,17 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - AudioClip.Create()を用いて、元のAudioClipのLoadInBackgroundを変更しないようにする
 
 ### 修正
-- Low-effort UploaderがTimeline上のAudioClipの数だけLayerを生成する
 
 ### 削除
 
 ### 非推奨
 
 ### 脆弱性
+
+## [1.0.3] - [2025-06-24]
+### 修正
+- Low-effort Uploaderが英語以外の環境で作られたTimelineでも正しく動作するように
+- Low-effort Uploaderは複数存在するAudioClipに対しても1Clip、1Layerのみを生成するように
 
 ## [1.0.2] - [2025-06-24]
 ### 修正
