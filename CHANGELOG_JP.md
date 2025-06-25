@@ -20,6 +20,7 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 変更
 - AudioClip.Create()を用いて、元のAudioClipのLoadInBackgroundを変更しないようにする
+- ResolvingフェーズではTimelineの持つAnimator Componentへの参照が正しく取れるらしいのでそれを使うようにする
 
 ### 修正
 
@@ -28,6 +29,11 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ### 非推奨
 
 ### 脆弱性
+
+## [1.0.4] - [2025-06-26]
+### 修正
+- Low-effort Uploaderのnullチェックをもうちょっと強化
+- その他リファクタ等、内部的な修正
 
 ## [1.0.3] - [2025-06-24]
 ### 修正
