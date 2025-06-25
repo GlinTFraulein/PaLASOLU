@@ -163,6 +163,9 @@ namespace PaLASOLU
 
 				//Animator Setup (for AnimationClips)
 				Dictionary<string, string> bindings = lfuState.bindings;
+				if (bindings == null) return;
+
+				if (lfuState.recordedClips == null) return;
 
 				foreach (var binding in bindings)
 				{
