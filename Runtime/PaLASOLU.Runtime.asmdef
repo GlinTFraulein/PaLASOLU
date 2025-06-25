@@ -1,18 +1,18 @@
 {
-    "name": "info.glintfraulein.palasolu.runtime",
-    "rootNamespace": "",
-    "references": [
-        "Unity.Timeline",
-        "nadena.dev.modular-avatar",
-        "nadena.dev.ndmf"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": false,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+	"name": "info.glintfraulein.palasolu.runtime",
+	"rootNamespace": "",
+	"references": [
+		"Unity.Timeline",
+		"nadena.dev.modular-avatar",
+		"nadena.dev.ndmf"
+	],
+	"includePlatforms": [],
+	"excludePlatforms": [],
+	"allowUnsafeCode": false,
+	"overrideReferences": false,
+	"precompiledReferences": [],
+	"autoReferenced": false,
+	"defineConstraints": [],
+	"versionDefines": [],
+	"noEngineReferences": false
 }

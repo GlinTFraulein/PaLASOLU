@@ -1,22 +1,22 @@
 {
-    "name": "info.glintfraulein.palasolu.editor",
-    "rootNamespace": "",
-    "references": [
-        "Unity.Timeline",
-        "Unity.Timeline.Editor",
-        "nadena.dev.modular-avatar",
-        "nadena.dev.ndmf",
-        "info.glintfraulein.palasolu.runtime"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": false,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+	"name": "info.glintfraulein.palasolu.editor",
+	"rootNamespace": "",
+	"references": [
+		"Unity.Timeline",
+		"Unity.Timeline.Editor",
+		"nadena.dev.modular-avatar",
+		"nadena.dev.ndmf",
+		"info.glintfraulein.palasolu.runtime"
+	],
+	"includePlatforms": [
+		"Editor"
+	],
+	"excludePlatforms": [],
+	"allowUnsafeCode": false,
+	"overrideReferences": false,
+	"precompiledReferences": [],
+	"autoReferenced": false,
+	"defineConstraints": [],
+	"versionDefines": [],
+	"noEngineReferences": false
 }
