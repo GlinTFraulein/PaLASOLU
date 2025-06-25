@@ -21,7 +21,6 @@ namespace PaLASOLU
         public TimelineAsset timeline;
         public List<AnimationClip> recordedClips;
         public Dictionary<string, string> bindings;
-        public List<AnimationClip> playAudioClips;
     }
 
     public class LoweffortUploaderCore : Plugin<LoweffortUploaderCore>
@@ -40,7 +39,7 @@ namespace PaLASOLU
                 
                 if (obj == null)
                 {
-                    Debug.Log("[PaLASOLU] ログ : PaLASOLU Low-effort Uploaderが存在しません。");
+                    LogMessageSimplifier.PaLog(5, "PaLASOLU Low-effort Uploader is not found.");
                     return;
                 }
 
@@ -48,7 +47,7 @@ namespace PaLASOLU
                 PlayableDirector director = lfuState.director;
                 if (director == null)
                 {
-                    Debug.LogError("[PaLASOLU] エラー : PaLASOLU Low-effort Uploader に PlayableDirector コンポーネントが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PaLASOLU Low-eoofrt Uploader コンポーネント内の、「高度な設定」から Playable Director がNoneでないことを確認してください。");
+                    LogMessageSimplifier.PaLog(2, "PaLASOLU Low-effort Uploader に PlayableDirector コンポーネントが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PaLASOLU Low-eoofrt Uploader コンポーネント内の、「高度な設定」から Playable Director がNoneでないことを確認してください。");
                     return;
                 }
 
@@ -57,7 +56,7 @@ namespace PaLASOLU
                 TimelineAsset timeline = lfuState.timeline;
                 if (timeline == null)
                 {
-                    Debug.LogError("[PaLASOLU] エラー : PlayableDirector に Timeline Asset アセットが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PlayableDirector コンポーネント内の、 Playable が None でないことを確認してください。");
+                    LogMessageSimplifier.PaLog(2, "PlayableDirector に Timeline Asset アセットが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PlayableDirector コンポーネント内の、 Playable が None でないことを確認してください。");
                     return;
                 }
 
@@ -77,8 +76,6 @@ namespace PaLASOLU
                 //Animation Handling
                 lfuState.bindings = new Dictionary<string, string>();
                 Dictionary<string, string> bindings = lfuState.bindings;
-                lfuState.playAudioClips = new List<AnimationClip>();
-                List<AnimationClip> playAudioClips = lfuState.playAudioClips;
 
                 foreach (var track in timeline.GetOutputTracks())
                 {
@@ -107,8 +104,10 @@ namespace PaLASOLU
                 LoweffortUploader obj = lfuState?.lfUploader;
                 if (obj == null) return;
 
-                AnimationClip margedAudioClip = new AnimationClip();
-                margedAudioClip.name = "margedAudioClip";
+                if (lfuState.timeline == null) return;
+
+                AnimationClip mergedAudioClip = new AnimationClip();
+                mergedAudioClip.name = "mergedAudioClip";
 
                 foreach (var track in lfuState.timeline.GetOutputTracks())
                 {
@@ -124,7 +123,7 @@ namespace PaLASOLU
 
                             if (audioClip == null)
                             {
-                                Debug.LogWarning("[PaLASOLU] 警告 : " + nowClip.displayName + " にオーディオクリップが存在しません。");
+                                LogMessageSimplifier.PaLog(1, nowClip.displayName + " にオーディオクリップが存在しません。");
                                 continue;
                             }
 
@@ -156,13 +155,11 @@ namespace PaLASOLU
                             curve.AddKeySetActive((float)nowClip.start, true);
                             curve.AddKeySetActive((float)nowClip.end, false);
 
-                            AnimationUtility.SetEditorCurve(margedAudioClip, binding, curve);
-                            margedAudioClip.legacy = false;
+                            AnimationUtility.SetEditorCurve(mergedAudioClip, binding, curve);
+                            mergedAudioClip.legacy = false;
                         }
                     }
                 }
-
-                lfuState.playAudioClips.Add(margedAudioClip);
 
                 //Animator Setup (for AnimationClips)
                 Dictionary<string, string> bindings = lfuState.bindings;
@@ -187,7 +184,7 @@ namespace PaLASOLU
                     AnimationClip clip = lfuState.recordedClips.FirstOrDefault(c => c.name == clipName);  //前から名称一致で探している
                     if (clip == null)
                     {
-                        Debug.LogWarning($"[PaLASOLU] Recorded clipが見つかりません。: {clipName}");
+                        LogMessageSimplifier.PaLog(4, $"[PaLASOLU] Recorded clip is not found.: {clipName}");
                         continue;
                     }
                     
@@ -210,12 +207,8 @@ namespace PaLASOLU
                     rootController = new AnimatorController();
                     rootAnimator.runtimeAnimatorController = rootController;
                 }
-
-                foreach (AnimationClip playAudioClip in lfuState.playAudioClips)
-                {
-                    if (playAudioClip == null) continue;
-                    rootController.AddLayer(SetupNewLayerAndState(playAudioClip));
-                }
+                 
+                rootController.AddLayer(SetupNewLayerAndState(mergedAudioClip));
 
                 //PlayableDirector Delete
                 PlayableDirector director = lfuState.director;
@@ -226,7 +219,7 @@ namespace PaLASOLU
                     {
                         PrefabUtility.RecordPrefabInstancePropertyModifications(director);
                         Object.DestroyImmediate(director, true);
-                        Debug.Log("[PaLASOLU] PlayableDirector を Prefab から削除しました。");
+                        LogMessageSimplifier.PaLog(0, "PlayableDirector を Prefab から削除しました。");
                     }
                     else
                     {

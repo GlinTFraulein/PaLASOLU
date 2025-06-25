@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace PaLASOLU
 {
-    public class LogMessageSimplifier : MonoBehaviour
+    public class LogMessageSimplifier
     {
-        public void PaLog(int num, string message)
+        public static void PaLog(int num, string message)
         {
             string returnMessage = "[PaLASOLU] ";
             if (num == 0) returnMessage += "ÉçÉO : ";
