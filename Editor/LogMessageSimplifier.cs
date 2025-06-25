@@ -7,7 +7,7 @@ namespace PaLASOLU
 		public static void PaLog(int num, string message)
 		{
 			string returnMessage = "[PaLASOLU] ";
-			if (num == 0) returnMessage += "ログ : ";
+			if (num == 0) returnMessage += "ログ(正常) : ";
 			else if (num == 1) returnMessage += "警告 : ";
 			else if (num == 2) returnMessage += "エラー : ";
 			else

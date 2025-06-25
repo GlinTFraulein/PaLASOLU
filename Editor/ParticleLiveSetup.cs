@@ -2,7 +2,6 @@
 
 using System;
 using System.IO;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
@@ -61,7 +60,7 @@ namespace PaLASOLU
 			{
 				if (rootFolderName == string.Empty)
 				{
-					Debug.LogError("[PaLASOLU] エラー : フォルダ名がありません。");
+                    LogMessageSimplifier.PaLog(2, "フォルダ名がありません。");
 					return;
 				}
 
@@ -99,14 +98,14 @@ namespace PaLASOLU
 
 			if (File.Exists(timelinePath))
 			{
-				Debug.LogWarning("[PaLASOLU] 警告 : " + timelinePath + " ファイルは既に存在します。新しいファイルは作られず、既存のTimelineデータに変更を加えません。");
+                LogMessageSimplifier.PaLog(1, $"{timelinePath} ファイルは既に存在します。新しいファイルは作られず、既存のTimelineデータに変更を加えません。");
 				existTimeline = true;
 			}
 			else
 			{
 				var playable = ScriptableObject.CreateInstance<TimelineAsset>();
 				AssetDatabase.CreateAsset(playable, timelinePath);
-				Debug.Log("[PaLASOLU] ログ(正常) : " + timelinePath + " を作りました。");
+                LogMessageSimplifier.PaLog(0, $"{timelinePath} を作りました。");
 				existTimeline = false;
 			}
 
@@ -157,7 +156,7 @@ namespace PaLASOLU
 
 			if (typeTimelineWindow == null)
 			{
-				Debug.LogWarning("[PaLASOLU] 警告 : TimelineWindow が見つかりませんでした。Timeline パッケージがロードされているか確認してください。");
+                LogMessageSimplifier.PaLog(1, "TimelineWindow が見つかりませんでした。Timeline パッケージがロードされているか確認してください。");
 			}
 			else
 			{
@@ -180,14 +179,14 @@ namespace PaLASOLU
 		{
 			if (Directory.Exists(path))
 			{
-				Debug.LogWarning("[PaLASOLU] 警告 : " + path + "フォルダは既に存在します。新しいフォルダは作られません。");
+                LogMessageSimplifier.PaLog(1, $"{path} フォルダは既に存在します。新しいフォルダは作られません。");
 				return false;
 				
 			}
 			else
 			{
 				Directory.CreateDirectory(path);
-				Debug.Log("[PaLASOLU] ログ(正常) : " + path + "フォルダを作りました。");
+                LogMessageSimplifier.PaLog(0, $"{path} フォルダを作りました。");
 				return true;
 			}
 		}

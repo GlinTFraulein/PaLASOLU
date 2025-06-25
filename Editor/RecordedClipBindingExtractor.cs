@@ -4,7 +4,6 @@ using UnityEngine.Timeline;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine.Playables;
-using UnityEngine.UIElements;
 
 namespace PaLASOLU
 {
@@ -14,21 +13,21 @@ namespace PaLASOLU
 		{
 			if (director == null)
 			{
-				Debug.LogWarning("[PaLASOLU] 警告 : PlayableDirectorがありません。処理はスキップされます。");
+				LogMessageSimplifier.PaLog(1, "PlayableDirectorがありません。処理はスキップされます。");
 				return;
 			}
 
 			TimelineAsset timeline = director.playableAsset as TimelineAsset;
 			if (timeline == null)
 			{
-				Debug.LogWarning("[PaLASOLU] 警告 : PlayableDirectorにTimelineがありません。処理はスキップされます。");
+                LogMessageSimplifier.PaLog(1, "PlayableDirectorにTimelineがありません。処理はスキップされます。");
 				return;
 			}
 
 			string timelinePath = AssetDatabase.GetAssetPath(timeline);
 			if (timeline == null)
 			{
-				Debug.LogWarning("[PaLASOLU] 警告 : Timelineのパスが取得できません。処理はスキップされます。");
+				LogMessageSimplifier.PaLog(1, "Timelineのパスが取得できません。処理はスキップされます。");
 				return;
 			}
 
@@ -45,7 +44,7 @@ namespace PaLASOLU
 
 			if (recordedClips.Count == 0)
 			{
-				Debug.LogWarning("[PaLASOLU] 警告 : TimelineにRecorded Clipがありません。処理はスキップされます。");
+				LogMessageSimplifier.PaLog(1, "TimelineにRecorded Clipがありません。処理はスキップされます。");
 				return;
 			}
 
@@ -76,7 +75,7 @@ namespace PaLASOLU
 
 			if (recordedClips.Count == 0)
 			{
-				Debug.LogWarning("[PaLASOLU] 警告 : Recorded Clipに紐づいたAnimatorがありません。処理はスキップされます。");
+				LogMessageSimplifier.PaLog(1, "Recorded Clipに紐づいたAnimatorがありません。処理はスキップされます。");
 				return;
 			}
 
@@ -88,7 +87,7 @@ namespace PaLASOLU
 			File.WriteAllText(outputPath, json);
 			AssetDatabase.Refresh();
 
-			Debug.Log($"[PaLASOLU] Recorded Clip Bindings を出力しました: {outputPath}");
+            LogMessageSimplifier.PaLog(0, $"[PaLASOLU] Recorded Clip Bindings を出力しました: {outputPath}");
 		}
 
 		public static string GetGameObjectPath(GameObject obj)

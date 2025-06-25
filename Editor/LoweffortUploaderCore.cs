@@ -123,7 +123,7 @@ namespace PaLASOLU
 
 							if (audioClip == null)
 							{
-								LogMessageSimplifier.PaLog(1, nowClip.displayName + " にオーディオクリップが存在しません。");
+								LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} にオーディオクリップが存在しません。");
 								continue;
 							}
 
