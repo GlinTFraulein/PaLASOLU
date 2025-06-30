@@ -39,7 +39,7 @@ namespace PaLASOLU
 				
 				if (obj == null)
 				{
-					LogMessageSimplifier.PaLog(5, "PaLASOLU Low-effort Uploader is not found.");
+					LogMessageSimplifier.PaLog(0, "PaLASOLU Low-effort Uploader is not found.");
 					return;
 				}
 
