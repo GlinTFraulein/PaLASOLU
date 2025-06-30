@@ -28,18 +28,15 @@ namespace PaLASOLU
 		[MenuItem("Tools/PaLASOLU/ParticleLive Setup")]
 		static void Init()
 		{
-			ParticleLiveSetup window = (ParticleLiveSetup)GetWindow(typeof(ParticleLiveSetup));
-			banner = AssetDatabase.LoadAssetAtPath<Texture>(bannerPath);
-			window.titleContent = new GUIContent("Particle Live Setup");
-			window.Show();
+			GetWindow<ParticleLiveSetup>("Particle Live Setup");
 		}
 
-        private void OnEnable()
-        {
-			Init();
-        }
+		private void OnEnable()
+		{
+			banner = AssetDatabase.LoadAssetAtPath<Texture>(bannerPath);
+		}
 
-        private void OnGUI()
+		private void OnGUI()
 		{
 			GUILayout.Space(4);
 
@@ -65,7 +62,7 @@ namespace PaLASOLU
 			{
 				if (rootFolderName == string.Empty)
 				{
-                    LogMessageSimplifier.PaLog(2, "フォルダ名がありません。");
+					LogMessageSimplifier.PaLog(2, "フォルダ名がありません。");
 					return;
 				}
 
@@ -103,14 +100,14 @@ namespace PaLASOLU
 
 			if (File.Exists(timelinePath))
 			{
-                LogMessageSimplifier.PaLog(1, $"{timelinePath} ファイルは既に存在します。新しいファイルは作られず、既存のTimelineデータに変更を加えません。");
+				LogMessageSimplifier.PaLog(1, $"{timelinePath} ファイルは既に存在します。新しいファイルは作られず、既存のTimelineデータに変更を加えません。");
 				existTimeline = true;
 			}
 			else
 			{
 				var playable = ScriptableObject.CreateInstance<TimelineAsset>();
 				AssetDatabase.CreateAsset(playable, timelinePath);
-                LogMessageSimplifier.PaLog(0, $"{timelinePath} を作りました。");
+				LogMessageSimplifier.PaLog(0, $"{timelinePath} を作りました。");
 				existTimeline = false;
 			}
 
@@ -161,7 +158,7 @@ namespace PaLASOLU
 
 			if (typeTimelineWindow == null)
 			{
-                LogMessageSimplifier.PaLog(1, "TimelineWindow が見つかりませんでした。Timeline パッケージがロードされているか確認してください。");
+				LogMessageSimplifier.PaLog(1, "TimelineWindow が見つかりませんでした。Timeline パッケージがロードされているか確認してください。");
 			}
 			else
 			{
@@ -184,14 +181,14 @@ namespace PaLASOLU
 		{
 			if (Directory.Exists(path))
 			{
-                LogMessageSimplifier.PaLog(1, $"{path} フォルダは既に存在します。新しいフォルダは作られません。");
+				LogMessageSimplifier.PaLog(1, $"{path} フォルダは既に存在します。新しいフォルダは作られません。");
 				return false;
 				
 			}
 			else
 			{
 				Directory.CreateDirectory(path);
-                LogMessageSimplifier.PaLog(0, $"{path} フォルダを作りました。");
+				LogMessageSimplifier.PaLog(0, $"{path} フォルダを作りました。");
 				return true;
 			}
 		}
