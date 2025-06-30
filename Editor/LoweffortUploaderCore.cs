@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -47,7 +47,7 @@ namespace PaLASOLU
 				PlayableDirector director = lfuState.director;
 				if (director == null)
 				{
-					LogMessageSimplifier.PaLog(2, "PaLASOLU Low-effort Uploader ‚É PlayableDirector ƒRƒ“ƒ|[ƒlƒ“ƒg‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñILow-effort Uploader‚Ìˆ—‚ÍƒXƒLƒbƒv‚³‚ê‚Ü‚·B\nPaLASOLU Setup Optimization ‚©‚çƒZƒbƒgƒAƒbƒv‚ğs‚Á‚½ê‡A\"[Šy‹È–¼]_ParticleLive/WorldFixed/ParticleLive\" GameObject ‚ÌA PaLASOLU Low-eoofrt Uploader ƒRƒ“ƒ|[ƒlƒ“ƒg“à‚ÌAu‚“x‚Èİ’èv‚©‚ç Playable Director ‚ªNone‚Å‚È‚¢‚±‚Æ‚ğŠm”F‚µ‚Ä‚­‚¾‚³‚¢B");
+					LogMessageSimplifier.PaLog(2, "PaLASOLU Low-effort Uploader ã« PlayableDirector ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ï¼Low-effort Uploaderã®å‡¦ç†ã¯ã‚¹ã‚­ãƒƒãƒ—ã•ã‚Œã¾ã™ã€‚\nPaLASOLU Setup Optimization ã‹ã‚‰ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã‚’è¡Œã£ãŸå ´åˆã€\"[æ¥½æ›²å]_ParticleLive/WorldFixed/ParticleLive\" GameObject ã®ã€ PaLASOLU Low-eoofrt Uploader ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆå†…ã®ã€ã€Œé«˜åº¦ãªè¨­å®šã€ã‹ã‚‰ Playable Director ãŒNoneã§ãªã„ã“ã¨ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚");
 					return;
 				}
 
@@ -56,7 +56,7 @@ namespace PaLASOLU
 				TimelineAsset timeline = lfuState.timeline;
 				if (timeline == null)
 				{
-					LogMessageSimplifier.PaLog(2, "PlayableDirector ‚É Timeline Asset ƒAƒZƒbƒg‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñILow-effort Uploader‚Ìˆ—‚ÍƒXƒLƒbƒv‚³‚ê‚Ü‚·B\nPaLASOLU Setup Optimization ‚©‚çƒZƒbƒgƒAƒbƒv‚ğs‚Á‚½ê‡A\"[Šy‹È–¼]_ParticleLive/WorldFixed/ParticleLive\" GameObject ‚ÌA PlayableDirector ƒRƒ“ƒ|[ƒlƒ“ƒg“à‚ÌA Playable ‚ª None ‚Å‚È‚¢‚±‚Æ‚ğŠm”F‚µ‚Ä‚­‚¾‚³‚¢B");
+					LogMessageSimplifier.PaLog(2, "PlayableDirector ã« Timeline Asset ã‚¢ã‚»ãƒƒãƒˆãŒè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ï¼Low-effort Uploaderã®å‡¦ç†ã¯ã‚¹ã‚­ãƒƒãƒ—ã•ã‚Œã¾ã™ã€‚\nPaLASOLU Setup Optimization ã‹ã‚‰ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã‚’è¡Œã£ãŸå ´åˆã€\"[æ¥½æ›²å]_ParticleLive/WorldFixed/ParticleLive\" GameObject ã®ã€ PlayableDirector ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆå†…ã®ã€ Playable ãŒ None ã§ãªã„ã“ã¨ã‚’ç¢ºèªã—ã¦ãã ã•ã„ã€‚");
 					return;
 				}
 
@@ -88,7 +88,7 @@ namespace PaLASOLU
 						var infiniteClip = animationTrack.infiniteClip;
 						if (infiniteClip == null /*|| !infiniteClip.name.StartsWith("Recorded")*/) continue;
 
-						//animatorPath‚Íobj.gameObject‚©‚ç‚Ì‘Š‘ÎƒpƒX‚ğæ‚é
+						//animatorPathã¯obj.gameObjectã‹ã‚‰ã®ç›¸å¯¾ãƒ‘ã‚¹ã‚’å–ã‚‹
 						string animatorPath = GetRelativePath(GetGameObjectPath(animator.gameObject), GetGameObjectPath(obj.gameObject));
 						bindings[infiniteClip.name] = animatorPath;
 					}
@@ -123,7 +123,7 @@ namespace PaLASOLU
 
 							if (audioClip == null)
 							{
-								LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} ‚ÉƒI[ƒfƒBƒIƒNƒŠƒbƒv‚ª‘¶İ‚µ‚Ü‚¹‚ñB");
+								LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} ã«ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã‚¯ãƒªãƒƒãƒ—ãŒå­˜åœ¨ã—ã¾ã›ã‚“ã€‚");
 								continue;
 							}
 
@@ -184,7 +184,7 @@ namespace PaLASOLU
 						animator.runtimeAnimatorController = controller;
 					}
 
-					AnimationClip clip = lfuState.recordedClips.FirstOrDefault(c => c.name == clipName);  //‘O‚©‚ç–¼Ìˆê’v‚Å’T‚µ‚Ä‚¢‚é
+					AnimationClip clip = lfuState.recordedClips.FirstOrDefault(c => c.name == clipName);  //å‰ã‹ã‚‰åç§°ä¸€è‡´ã§æ¢ã—ã¦ã„ã‚‹
 					if (clip == null)
 					{
 						LogMessageSimplifier.PaLog(4, $"[PaLASOLU] Recorded clip is not found.: {clipName}");
@@ -222,7 +222,7 @@ namespace PaLASOLU
 					{
 						PrefabUtility.RecordPrefabInstancePropertyModifications(director);
 						Object.DestroyImmediate(director, true);
-						LogMessageSimplifier.PaLog(0, "PlayableDirector ‚ğ Prefab ‚©‚çíœ‚µ‚Ü‚µ‚½B");
+						LogMessageSimplifier.PaLog(0, "PlayableDirector ã‚’ Prefab ã‹ã‚‰å‰Šé™¤ã—ã¾ã—ãŸã€‚");
 					}
 					else
 					{
@@ -240,9 +240,9 @@ namespace PaLASOLU
 				return null; // invalid
 
 			if (fullPath == rootPath)
-				return "."; // ©g
+				return "."; // è‡ªèº«
 
-			return fullPath.Substring(rootPath.Length + 1); // '/'‚ğ”ò‚Î‚·
+			return fullPath.Substring(rootPath.Length + 1); // '/'ã‚’é£›ã°ã™
 		}
 
 		public static string GetGameObjectPath(GameObject wantPassObject)

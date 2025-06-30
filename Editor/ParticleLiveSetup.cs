@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+ï»¿#if UNITY_EDITOR
 
 using System;
 using System.IO;
@@ -54,22 +54,22 @@ namespace PaLASOLU
 
 			GUILayout.Space(8);
 
-			GUILayout.Label("ƒp[ƒeƒBƒNƒ‹ƒ‰ƒCƒu—pƒtƒHƒ‹ƒ_‚ÌV‹Kì¬", EditorStyles.boldLabel);
-			rootFolderName = EditorGUILayout.TextField("ƒtƒHƒ‹ƒ_–¼(Šy‹È–¼‚ğ„§)", rootFolderName);
-			particleLiveAudio = EditorGUILayout.ObjectField("Šy‹Èƒtƒ@ƒCƒ‹(‚È‚­‚Ä‚à‰Â)", particleLiveAudio, typeof(AudioClip), false) as AudioClip;
+			GUILayout.Label("ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«ãƒ©ã‚¤ãƒ–ç”¨ãƒ•ã‚©ãƒ«ãƒ€ã®æ–°è¦ä½œæˆ", EditorStyles.boldLabel);
+			rootFolderName = EditorGUILayout.TextField("ãƒ•ã‚©ãƒ«ãƒ€å(æ¥½æ›²åã‚’æ¨å¥¨)", rootFolderName);
+			particleLiveAudio = EditorGUILayout.ObjectField("æ¥½æ›²ãƒ•ã‚¡ã‚¤ãƒ«(ãªãã¦ã‚‚å¯)", particleLiveAudio, typeof(AudioClip), false) as AudioClip;
 
-			if (GUILayout.Button("ƒZƒbƒgƒAƒbƒvI"))
+			if (GUILayout.Button("ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ï¼"))
 			{
 				if (rootFolderName == string.Empty)
 				{
-					LogMessageSimplifier.PaLog(2, "ƒtƒHƒ‹ƒ_–¼‚ª‚ ‚è‚Ü‚¹‚ñB");
+					LogMessageSimplifier.PaLog(2, "ãƒ•ã‚©ãƒ«ãƒ€åãŒã‚ã‚Šã¾ã›ã‚“ã€‚");
 					return;
 				}
 
 				OptimizedSetup(rootFolderName);
 			}
 
-			IsShowAdvancedSettings = EditorGUILayout.Foldout(IsShowAdvancedSettings, "‚“x‚Èİ’è");
+			IsShowAdvancedSettings = EditorGUILayout.Foldout(IsShowAdvancedSettings, "é«˜åº¦ãªè¨­å®š");
 			if (IsShowAdvancedSettings)
 			{
 				EditorGUI.indentLevel = 1;
@@ -89,7 +89,7 @@ namespace PaLASOLU
 				savePath = EditorUtility.OpenFolderPanel("Select Folder Directory", Application.dataPath, "ParticleLive");
 				savePath = Path.Combine(savePath, rootFolderName);
 
-				//‘Š‘ÎƒpƒX•ÏŠ·
+				//ç›¸å¯¾ãƒ‘ã‚¹å¤‰æ›
 				string[] spritPath = Regex.Split(savePath, "/Assets/");
 				savePath = "Assets/" + spritPath[1];
 			}
@@ -100,14 +100,14 @@ namespace PaLASOLU
 
 			if (File.Exists(timelinePath))
 			{
-				LogMessageSimplifier.PaLog(1, $"{timelinePath} ƒtƒ@ƒCƒ‹‚ÍŠù‚É‘¶İ‚µ‚Ü‚·BV‚µ‚¢ƒtƒ@ƒCƒ‹‚Íì‚ç‚ê‚¸AŠù‘¶‚ÌTimelineƒf[ƒ^‚É•ÏX‚ğ‰Á‚¦‚Ü‚¹‚ñB");
+				LogMessageSimplifier.PaLog(1, $"{timelinePath} ãƒ•ã‚¡ã‚¤ãƒ«ã¯æ—¢ã«å­˜åœ¨ã—ã¾ã™ã€‚æ–°ã—ã„ãƒ•ã‚¡ã‚¤ãƒ«ã¯ä½œã‚‰ã‚Œãšã€æ—¢å­˜ã®Timelineãƒ‡ãƒ¼ã‚¿ã«å¤‰æ›´ã‚’åŠ ãˆã¾ã›ã‚“ã€‚");
 				existTimeline = true;
 			}
 			else
 			{
 				var playable = ScriptableObject.CreateInstance<TimelineAsset>();
 				AssetDatabase.CreateAsset(playable, timelinePath);
-				LogMessageSimplifier.PaLog(0, $"{timelinePath} ‚ğì‚è‚Ü‚µ‚½B");
+				LogMessageSimplifier.PaLog(0, $"{timelinePath} ã‚’ä½œã‚Šã¾ã—ãŸã€‚");
 				existTimeline = false;
 			}
 
@@ -158,7 +158,7 @@ namespace PaLASOLU
 
 			if (typeTimelineWindow == null)
 			{
-				LogMessageSimplifier.PaLog(1, "TimelineWindow ‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½BTimeline ƒpƒbƒP[ƒW‚ªƒ[ƒh‚³‚ê‚Ä‚¢‚é‚©Šm”F‚µ‚Ä‚­‚¾‚³‚¢B");
+				LogMessageSimplifier.PaLog(1, "TimelineWindow ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚Timeline ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ãŒãƒ­ãƒ¼ãƒ‰ã•ã‚Œã¦ã„ã‚‹ã‹ç¢ºèªã—ã¦ãã ã•ã„ã€‚");
 			}
 			else
 			{
@@ -170,8 +170,8 @@ namespace PaLASOLU
 			{
 				EditorUtility.DisplayDialog(
 					"[PaLASOLU] ParticleLive Setup",
-					"Timeline‚Å‚Ìì‹Æ‚ğn‚ß‚é‘O‚ÉATimeline ƒEƒBƒ“ƒhƒE‚Ì‰Eã‚É‚ ‚é Œ®ƒ}[ƒNuLockvƒ{ƒ^ƒ“‚ğƒNƒŠƒbƒN‚µ‚Ä‚­‚¾‚³‚¢B\n" +
-					"‚±‚ê‚É‚æ‚è‘I‘ğ‚µ‚½ Timeline ‚ªŒÅ’è‚³‚êAƒAƒjƒ[ƒVƒ‡ƒ“‚Ì‹L˜^‚È‚Ç‚ª³í‚És‚¦‚é‚æ‚¤‚É‚È‚è‚Ü‚·B",
+					"Timelineã§ã®ä½œæ¥­ã‚’å§‹ã‚ã‚‹å‰ã«ã€Timeline ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å³ä¸Šã«ã‚ã‚‹ éµãƒãƒ¼ã‚¯ã€ŒLockã€ãƒœã‚¿ãƒ³ã‚’ã‚¯ãƒªãƒƒã‚¯ã—ã¦ãã ã•ã„ã€‚\n" +
+					"ã“ã‚Œã«ã‚ˆã‚Šé¸æŠã—ãŸ Timeline ãŒå›ºå®šã•ã‚Œã€ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®è¨˜éŒ²ãªã©ãŒæ­£å¸¸ã«è¡Œãˆã‚‹ã‚ˆã†ã«ãªã‚Šã¾ã™ã€‚",
 					"OK"
 					);
 			}
@@ -181,14 +181,14 @@ namespace PaLASOLU
 		{
 			if (Directory.Exists(path))
 			{
-				LogMessageSimplifier.PaLog(1, $"{path} ƒtƒHƒ‹ƒ_‚ÍŠù‚É‘¶İ‚µ‚Ü‚·BV‚µ‚¢ƒtƒHƒ‹ƒ_‚Íì‚ç‚ê‚Ü‚¹‚ñB");
+				LogMessageSimplifier.PaLog(1, $"{path} ãƒ•ã‚©ãƒ«ãƒ€ã¯æ—¢ã«å­˜åœ¨ã—ã¾ã™ã€‚æ–°ã—ã„ãƒ•ã‚©ãƒ«ãƒ€ã¯ä½œã‚‰ã‚Œã¾ã›ã‚“ã€‚");
 				return false;
 				
 			}
 			else
 			{
 				Directory.CreateDirectory(path);
-				LogMessageSimplifier.PaLog(0, $"{path} ƒtƒHƒ‹ƒ_‚ğì‚è‚Ü‚µ‚½B");
+				LogMessageSimplifier.PaLog(0, $"{path} ãƒ•ã‚©ãƒ«ãƒ€ã‚’ä½œã‚Šã¾ã—ãŸã€‚");
 				return true;
 			}
 		}
