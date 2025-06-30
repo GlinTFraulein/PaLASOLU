@@ -17,6 +17,8 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - Timelineチュートリアル
 - サンプルPrefabを置けるようにする
 - MeshCollider削除
+- Export Prefab without Timeline
+- AudioTrackの音量がアップロードに反映されるか選べるようにする設定
 
 ### 変更
 - AudioClip.Create()を用いて、元のAudioClipのLoadInBackgroundを変更しないようにする
@@ -29,6 +31,12 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ### 非推奨
 
 ### 脆弱性
+
+## [1.0.5] - [2025-07-01]
+### 修正
+- 一部環境で文字化けが発生していた問題の修正 #1
+- Setup OptimizationがReload Domain後にエラーを吐いていたのを修正 #2
+- その他、軽微な修正
 
 ## [1.0.4] - [2025-06-26]
 ### 修正
