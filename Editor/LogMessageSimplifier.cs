@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 namespace PaLASOLU
 {
@@ -7,12 +7,12 @@ namespace PaLASOLU
 		public static void PaLog(int num, string message)
 		{
 			string returnMessage = "[PaLASOLU] ";
-			if (num == 0) returnMessage += "ƒƒO(³í) : ";
-			else if (num == 1) returnMessage += "Œx : ";
-			else if (num == 2) returnMessage += "ƒGƒ‰[ : ";
+			if (num == 0) returnMessage += "ãƒ­ã‚°(æ­£å¸¸) : ";
+			else if (num == 1) returnMessage += "è­¦å‘Š : ";
+			else if (num == 2) returnMessage += "ã‚¨ãƒ©ãƒ¼ : ";
 			else
 			{
-				returnMessage += "(‚±‚ê‚ğŒ©‚Â‚¯‚½‚çìÒ GlinTFraulein ‚É•ñI) ";
+				returnMessage += "(ã“ã‚Œã‚’è¦‹ã¤ã‘ãŸã‚‰ä½œè€… GlinTFraulein ã«å ±å‘Šï¼) ";
 
 				if (num == 3) returnMessage += "InternalLog : ";
 				else if (num == 4) returnMessage += "InternalWarning : ";

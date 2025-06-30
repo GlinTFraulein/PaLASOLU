@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEditor;
 using UnityEngine.Timeline;
 using System.IO;
@@ -13,21 +13,21 @@ namespace PaLASOLU
 		{
 			if (director == null)
 			{
-				LogMessageSimplifier.PaLog(1, "PlayableDirector‚ª‚ ‚è‚Ü‚¹‚ñBˆ—‚ÍƒXƒLƒbƒv‚³‚ê‚Ü‚·B");
+				LogMessageSimplifier.PaLog(1, "PlayableDirectorãŒã‚ã‚Šã¾ã›ã‚“ã€‚å‡¦ç†ã¯ã‚¹ã‚­ãƒƒãƒ—ã•ã‚Œã¾ã™ã€‚");
 				return;
 			}
 
 			TimelineAsset timeline = director.playableAsset as TimelineAsset;
 			if (timeline == null)
 			{
-                LogMessageSimplifier.PaLog(1, "PlayableDirector‚ÉTimeline‚ª‚ ‚è‚Ü‚¹‚ñBˆ—‚ÍƒXƒLƒbƒv‚³‚ê‚Ü‚·B");
+                LogMessageSimplifier.PaLog(1, "PlayableDirectorã«TimelineãŒã‚ã‚Šã¾ã›ã‚“ã€‚å‡¦ç†ã¯ã‚¹ã‚­ãƒƒãƒ—ã•ã‚Œã¾ã™ã€‚");
 				return;
 			}
 
 			string timelinePath = AssetDatabase.GetAssetPath(timeline);
 			if (timeline == null)
 			{
-				LogMessageSimplifier.PaLog(1, "Timeline‚ÌƒpƒX‚ªæ“¾‚Å‚«‚Ü‚¹‚ñBˆ—‚ÍƒXƒLƒbƒv‚³‚ê‚Ü‚·B");
+				LogMessageSimplifier.PaLog(1, "Timelineã®ãƒ‘ã‚¹ãŒå–å¾—ã§ãã¾ã›ã‚“ã€‚å‡¦ç†ã¯ã‚¹ã‚­ãƒƒãƒ—ã•ã‚Œã¾ã™ã€‚");
 				return;
 			}
 
@@ -44,7 +44,7 @@ namespace PaLASOLU
 
 			if (recordedClips.Count == 0)
 			{
-				LogMessageSimplifier.PaLog(1, "Timeline‚ÉRecorded Clip‚ª‚ ‚è‚Ü‚¹‚ñBˆ—‚ÍƒXƒLƒbƒv‚³‚ê‚Ü‚·B");
+				LogMessageSimplifier.PaLog(1, "Timelineã«Recorded ClipãŒã‚ã‚Šã¾ã›ã‚“ã€‚å‡¦ç†ã¯ã‚¹ã‚­ãƒƒãƒ—ã•ã‚Œã¾ã™ã€‚");
 				return;
 			}
 
@@ -75,7 +75,7 @@ namespace PaLASOLU
 
 			if (recordedClips.Count == 0)
 			{
-				LogMessageSimplifier.PaLog(1, "Recorded Clip‚É•R‚Ã‚¢‚½Animator‚ª‚ ‚è‚Ü‚¹‚ñBˆ—‚ÍƒXƒLƒbƒv‚³‚ê‚Ü‚·B");
+				LogMessageSimplifier.PaLog(1, "Recorded Clipã«ç´ã¥ã„ãŸAnimatorãŒã‚ã‚Šã¾ã›ã‚“ã€‚å‡¦ç†ã¯ã‚¹ã‚­ãƒƒãƒ—ã•ã‚Œã¾ã™ã€‚");
 				return;
 			}
 
@@ -87,7 +87,7 @@ namespace PaLASOLU
 			File.WriteAllText(outputPath, json);
 			AssetDatabase.Refresh();
 
-            LogMessageSimplifier.PaLog(0, $"[PaLASOLU] Recorded Clip Bindings ‚ğo—Í‚µ‚Ü‚µ‚½: {outputPath}");
+            LogMessageSimplifier.PaLog(0, $"[PaLASOLU] Recorded Clip Bindings ã‚’å‡ºåŠ›ã—ã¾ã—ãŸ: {outputPath}");
 		}
 
 		public static string GetGameObjectPath(GameObject obj)

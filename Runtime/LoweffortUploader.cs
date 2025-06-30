@@ -1,4 +1,4 @@
-using UnityEditor;
+ï»¿using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
 using VRC.SDKBase;
@@ -21,7 +21,7 @@ namespace PaLASOLU
 			director = GetComponent<PlayableDirector>();
 			if (director == null)
 			{
-				Debug.LogWarning("[PaLASOLU] Œx : Low-effort Uploader‚ğƒAƒ^ƒbƒ`‚µ‚½GameObject‚É‚ÍAPlayableDirectorƒRƒ“ƒ|[ƒlƒ“ƒg‚ª‘¶İ‚µ‚Ü‚¹‚ñI Œã‚©‚çè“®‚Å’Ç‰Á‚·‚éê‡‚ÍA‚“x‚Èİ’è‚©‚ç’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢B");
+				Debug.LogWarning("[PaLASOLU] è­¦å‘Š : Low-effort Uploaderã‚’ã‚¢ã‚¿ãƒƒãƒã—ãŸGameObjectã«ã¯ã€PlayableDirectorã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒå­˜åœ¨ã—ã¾ã›ã‚“ï¼ å¾Œã‹ã‚‰æ‰‹å‹•ã§è¿½åŠ ã™ã‚‹å ´åˆã¯ã€é«˜åº¦ãªè¨­å®šã‹ã‚‰è¿½åŠ ã—ã¦ãã ã•ã„ã€‚");
 			}
 		}
 		
@@ -42,9 +42,9 @@ namespace PaLASOLU
 				GUILayout.Space(8);
 
 				LoweffortUploader uploader = (LoweffortUploader)target;
-				EditorGUILayout.HelpBox("‚±‚ÌƒXƒNƒŠƒvƒg‚ÆPlayable DirectorƒRƒ“ƒ|[ƒlƒ“ƒg‚ª“¯‚¶GameObject‚É•t‚¢‚Ä‚¢‚éê‡A“KØ‚Èˆ—‚ğ‚µ‚ÄƒAƒbƒvƒ[ƒh‚ğs‚¢‚Ü‚·B", MessageType.Info);
+				EditorGUILayout.HelpBox("ã“ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆã¨Playable Directorã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒåŒã˜GameObjectã«ä»˜ã„ã¦ã„ã‚‹å ´åˆã€é©åˆ‡ãªå‡¦ç†ã‚’ã—ã¦ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ã‚’è¡Œã„ã¾ã™ã€‚", MessageType.Info);
 
-				if (advancedSettings = EditorGUILayout.Foldout(advancedSettings, "‚“x‚Èİ’è"))
+				if (advancedSettings = EditorGUILayout.Foldout(advancedSettings, "é«˜åº¦ãªè¨­å®š"))
 				{
 					uploader.director = EditorGUILayout.ObjectField("PlayableDirector", uploader.director, typeof(PlayableDirector), true) as PlayableDirector;
 					uploader.generateAudioObject = EditorGUILayout.Toggle("Generate Audio object", uploader.generateAudioObject);
@@ -67,7 +67,7 @@ namespace PaLASOLU
 
 				float inspectorWidth = EditorGUIUtility.currentViewWidth;
 				float maxWidth = 512f;
-				float displayWidth = Mathf.Min(inspectorWidth - 20f, maxWidth); // -20f‚Íƒ}[ƒWƒ“•ª
+				float displayWidth = Mathf.Min(inspectorWidth - 20f, maxWidth); // -20fã¯ãƒãƒ¼ã‚¸ãƒ³åˆ†
 				
 				float aspect = (float)banner.height / banner.width;
 				float displayHeight = displayWidth * aspect;
