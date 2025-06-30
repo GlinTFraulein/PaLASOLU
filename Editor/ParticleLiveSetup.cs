@@ -34,7 +34,12 @@ namespace PaLASOLU
 			window.Show();
 		}
 
-		private void OnGUI()
+        private void OnEnable()
+        {
+			Init();
+        }
+
+        private void OnGUI()
 		{
 			GUILayout.Space(4);
 
