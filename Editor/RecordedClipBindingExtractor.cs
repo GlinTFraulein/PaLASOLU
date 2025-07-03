@@ -20,7 +20,7 @@ namespace PaLASOLU
 			TimelineAsset timeline = director.playableAsset as TimelineAsset;
 			if (timeline == null)
 			{
-                LogMessageSimplifier.PaLog(1, "PlayableDirectorにTimelineがありません。処理はスキップされます。");
+				LogMessageSimplifier.PaLog(1, "PlayableDirectorにTimelineがありません。処理はスキップされます。");
 				return;
 			}
 
@@ -87,7 +87,7 @@ namespace PaLASOLU
 			File.WriteAllText(outputPath, json);
 			AssetDatabase.Refresh();
 
-            LogMessageSimplifier.PaLog(0, $"[PaLASOLU] Recorded Clip Bindings を出力しました: {outputPath}");
+			LogMessageSimplifier.PaLog(0, $"[PaLASOLU] Recorded Clip Bindings を出力しました: {outputPath}");
 		}
 
 		public static string GetGameObjectPath(GameObject obj)

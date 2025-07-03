@@ -145,6 +145,7 @@ namespace PaLASOLU
 
 							AudioSource audioSource = audioObject.AddComponent<AudioSource>();
 							audioSource.clip = audioClip;
+							//if (lfuState.lfUploader.isAffectedAudioVolume) audioSource.volume = GetAudioSourceFromTrack(track).volume;
 
 							//AnimationClip Generate
 							EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(audioObject.name);
