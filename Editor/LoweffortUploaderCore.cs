@@ -20,7 +20,7 @@ namespace PaLASOLU
 		public PlayableDirector director;
 		public TimelineAsset timeline;
 		public List<AnimationClip> recordedClips;
-		public Dictionary<string, string> bindings;
+		public Dictionary<string, GameObject> bindings;
 	}
 
 	public class LoweffortUploaderCore : Plugin<LoweffortUploaderCore>
@@ -36,7 +36,6 @@ namespace PaLASOLU
 				
 
 				LoweffortUploader obj = lfuState.lfUploader;
-				
 				if (obj == null)
 				{
 					LogMessageSimplifier.PaLog(0, "PaLASOLU Low-effort Uploader is not found.");
@@ -67,15 +66,15 @@ namespace PaLASOLU
 				List<AnimationClip> recordedClips = lfuState.recordedClips;
 				foreach (var asset in subAssets)
 				{
-					if (asset is AnimationClip clip /*&& clip.name.StartsWith("Recorded")*/)
+					if (asset is AnimationClip clip)
 					{
 						recordedClips.Add(clip);
 					}
 				}
 
 				//Animation Handling
-				lfuState.bindings = new Dictionary<string, string>();
-				Dictionary<string, string> bindings = lfuState.bindings;
+				lfuState.bindings = new Dictionary<string, GameObject>();
+				Dictionary<string, GameObject> bindings = lfuState.bindings;
 
 				foreach (var track in timeline.GetOutputTracks())
 				{
@@ -86,11 +85,11 @@ namespace PaLASOLU
 						if (animator == null) continue;
 
 						var infiniteClip = animationTrack.infiniteClip;
-						if (infiniteClip == null /*|| !infiniteClip.name.StartsWith("Recorded")*/) continue;
+						if (infiniteClip == null) continue;
 
-						//animatorPathはobj.gameObjectからの相対パスを取る
-						string animatorPath = GetRelativePath(GetGameObjectPath(animator.gameObject), GetGameObjectPath(obj.gameObject));
-						bindings[infiniteClip.name] = animatorPath;
+						//animatorObjectは紐付けられているGameObjectを取る(AnimatorはNDMFで一度削除されるため)
+						GameObject animatorObject = animator.gameObject;
+						bindings[infiniteClip.name] = animatorObject;
 					}
 				}
 			});
@@ -162,7 +161,7 @@ namespace PaLASOLU
 				}
 
 				//Animator Setup (for AnimationClips)
-				Dictionary<string, string> bindings = lfuState.bindings;
+				Dictionary<string, GameObject> bindings = lfuState.bindings;
 				if (bindings == null) return;
 
 				if (lfuState.recordedClips == null) return;
@@ -171,9 +170,11 @@ namespace PaLASOLU
 				{
 					//Get Animator
 					string clipName = binding.Key;
-					string animatorPath = binding.Value;
+					GameObject animatorObject = binding.Value;
 
-					Transform animatorTransform = obj.transform.Find(animatorPath == "." ? "" : animatorPath);
+                    LogMessageSimplifier.PaLog(3, $"{clipName}, {animatorObject}");
+
+					Transform animatorTransform = animatorObject.transform;
 					Animator animator = animatorTransform?.GetComponent<Animator>();
 
 					//Generate
