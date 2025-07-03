@@ -34,7 +34,6 @@ namespace PaLASOLU
 				LoweffortUploaderState lfuState = ctx.GetState<LoweffortUploaderState>();
 				lfuState.lfUploader = ctx?.AvatarRootObject.GetComponentInChildren<LoweffortUploader>(true);
 				
-
 				LoweffortUploader obj = lfuState.lfUploader;
 				if (obj == null)
 				{
@@ -105,8 +104,12 @@ namespace PaLASOLU
 
 				if (lfuState.timeline == null) return;
 
-				AnimationClip mergedAudioClip = new AnimationClip();
-				mergedAudioClip.name = "mergedAudioClip";
+				PlayableDirector director = lfuState.director;
+				if (director == null) return;
+
+				AnimationClip mergedClip = new AnimationClip();
+				mergedClip.name = "mergedClip";
+				mergedClip.legacy = false;
 
 				foreach (var track in lfuState.timeline.GetOutputTracks())
 				{
@@ -144,19 +147,46 @@ namespace PaLASOLU
 							audioSource.clip = audioClip;
 
 							//AnimationClip Generate
-							EditorCurveBinding binding = new EditorCurveBinding();
-							binding.path = audioObject.name;
-							binding.type = typeof(GameObject);
-							binding.propertyName = "m_IsActive";
+							EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(audioObject.name);
 
 							AnimationCurve curve = new AnimationCurve();
 							if ((float)nowClip.start != 0f) curve.AddKeySetActive(0f, false);
 							curve.AddKeySetActive((float)nowClip.start, true);
 							curve.AddKeySetActive((float)nowClip.end, false);
 
-							AnimationUtility.SetEditorCurve(mergedAudioClip, binding, curve);
-							mergedAudioClip.legacy = false;
+							AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
 						}
+					}
+
+					//Activate Handling
+					else if (track is ActivationTrack)
+					{
+						List<TimelineClip> clips = track.GetClips().ToList();
+
+						GameObject activateObject = director.GetGenericBinding(track) as GameObject;
+						if (activateObject != null)
+						{
+							LogMessageSimplifier.PaLog(1, $"{track.name} にGameObjectが存在しません。");
+						}
+
+						string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
+						string uniqueName = $"{activateObject.name}_{uniqueId}";
+						activateObject.name = uniqueName;
+
+						string activateObjectPath = GetGameObjectPath(activateObject);
+						string rootObjectPath = GetGameObjectPath(obj.gameObject);
+						EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(GetRelativePath(activateObjectPath, rootObjectPath));
+
+						AnimationCurve curve = new AnimationCurve();
+						
+						foreach (TimelineClip nowClip in clips)
+						{
+							if ((float)nowClip.start != 0f) curve.AddKeySetActive(0f, false);
+							curve.AddKeySetActive((float)nowClip.start, true);
+							curve.AddKeySetActive((float)nowClip.end, false);							
+						}
+
+						AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
 					}
 				}
 
@@ -171,8 +201,6 @@ namespace PaLASOLU
 					//Get Animator
 					string clipName = binding.Key;
 					GameObject animatorObject = binding.Value;
-
-                    LogMessageSimplifier.PaLog(3, $"{clipName}, {animatorObject}");
 
 					Transform animatorTransform = animatorObject.transform;
 					Animator animator = animatorTransform?.GetComponent<Animator>();
@@ -199,7 +227,7 @@ namespace PaLASOLU
 					}
 				}
 
-				//Animator Setup 2 (for AudioSource GameObjects)
+				//Animator Setup 2 (for mergedClip)
 				Animator rootAnimator = obj?.gameObject.GetComponent<Animator>();
 				if (rootAnimator == null)
 				{
@@ -212,11 +240,9 @@ namespace PaLASOLU
 					rootAnimator.runtimeAnimatorController = rootController;
 				}
 				 
-				rootController.AddLayer(SetupNewLayerAndState(mergedAudioClip));
+				rootController.AddLayer(SetupNewLayerAndState(mergedClip));
 
 				//PlayableDirector Delete
-				PlayableDirector director = lfuState.director;
-
 				if (director != null)
 				{
 					if (PrefabUtility.IsPartOfPrefabInstance(director))

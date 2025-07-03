@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 
 namespace PaLASOLU
@@ -22,6 +23,16 @@ namespace PaLASOLU
 			}
 
 			return self.AddKey(newKey);
+		}
+
+		public static EditorCurveBinding CreateIsActiveBinding(string path)
+		{
+			EditorCurveBinding binding = new EditorCurveBinding();
+			binding.path = path;
+			binding.type = typeof(GameObject);
+			binding.propertyName = "m_IsActive";
+
+			return binding;
 		}
 	}
 }
