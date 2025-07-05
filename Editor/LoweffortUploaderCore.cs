@@ -145,7 +145,7 @@ namespace PaLASOLU
 
 							AudioSource audioSource = audioObject.AddComponent<AudioSource>();
 							audioSource.clip = audioClip;
-							//if (lfuState.lfUploader.isAffectedAudioVolume) audioSource.volume = GetAudioSourceFromTrack(track).volume;
+							if (lfuState.lfUploader.isAffectedAudioVolume) audioSource.volume = GetTrackVolume(track);
 
 							//AnimationClip Generate
 							EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(audioObject.name);
@@ -308,6 +308,33 @@ namespace PaLASOLU
 			newState.motion = addClip;
 
 			return newLayer;
+		}
+
+		//WARNING : Using Internal API!!
+		float GetTrackVolume(TrackAsset track)
+		{
+			SerializedProperty properties = new SerializedObject(track).GetIterator();
+
+			while (properties.NextVisible(true))
+			{
+				if (properties.name == "m_TrackProperties")
+				{
+					var propertiesItr = properties.Copy();
+					var endProperties = propertiesItr.GetEndProperty();
+
+					while (propertiesItr.NextVisible(true) && !SerializedProperty.EqualContents(propertiesItr, endProperties))
+					{
+						if (propertiesItr.name == "volume")
+						{
+							return propertiesItr.floatValue;
+						}
+					}
+					LogMessageSimplifier.PaLog(4, $"Cannot find \"Volume\" property iterator.");
+				}
+			}
+
+			LogMessageSimplifier.PaLog(4, $"Cannot find \"m_TrackProperties\" property.");
+			return 1.0f;
 		}
 
 	}
