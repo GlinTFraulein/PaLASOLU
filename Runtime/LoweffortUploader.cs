@@ -1,6 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.Timeline;
 using VRC.SDKBase;
 using PaLASOLU;
 
@@ -11,6 +12,7 @@ namespace PaLASOLU
 	public class LoweffortUploader : MonoBehaviour, IEditorOnly
 	{
 		public PlayableDirector director;
+		public TimelineAsset timeline;
 		public bool generateAudioObject = true;
 		public bool isAffectedAudioVolume = false;
 		const string bannerPath = "Packages/info.glintfraulein.palasolu//Image/PaLASOLU_Banner.png";
@@ -54,6 +56,7 @@ namespace PaLASOLU
 
 				if (GUI.changed)
 				{
+					if (uploader.director != null) uploader.timeline = uploader.director.playableAsset as TimelineAsset;
 					EditorUtility.SetDirty(uploader);
 				}
 			}

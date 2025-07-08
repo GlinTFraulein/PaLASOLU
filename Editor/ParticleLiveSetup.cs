@@ -130,6 +130,10 @@ namespace PaLASOLU
 			PlayableDirector director = playableTarget.GetComponent<PlayableDirector>();
 			director.playableAsset = timeline;
 
+			LoweffortUploader lfUploader = playableTarget.GetComponent<LoweffortUploader>();
+			lfUploader.director = director;
+			lfUploader.timeline = timeline;
+
 			if (!existTimeline)
 			{
 				var animationTrack = timeline.CreateTrack<AnimationTrack>();

@@ -303,6 +303,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   director: {fileID: 5053311922658332038}
+  timeline: {fileID: 0}
   generateAudioObject: 1
   isAffectedAudioVolume: 0
 --- !u!1 &5337744151180354712
