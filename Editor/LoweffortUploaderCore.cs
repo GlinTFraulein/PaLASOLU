@@ -302,14 +302,6 @@ namespace PaLASOLU
 			return path;
 		}
 
-		public static Keyframe SetTangentIO(Keyframe keyframe)
-		{
-			keyframe.outTangent = float.PositiveInfinity;
-			keyframe.inTangent = float.PositiveInfinity;
-
-			return keyframe;
-		}
-
 		public static AnimatorControllerLayer SetupNewLayerAndState(AnimationClip addClip)
 		{
 			AnimatorControllerLayer newLayer = new AnimatorControllerLayer();
