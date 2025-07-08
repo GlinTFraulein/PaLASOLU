@@ -261,6 +261,9 @@ namespace PaLASOLU
 				//PlayableDirector Delete
 				if (director != null)
 				{
+                    GameObject parent = director.gameObject.transform.parent.gameObject;
+                    if (parent.name == "WorldFixed") parent.SetActive(false);
+                    
 					if (PrefabUtility.IsPartOfPrefabInstance(director))
 					{
 						PrefabUtility.RecordPrefabInstancePropertyModifications(director);
@@ -272,8 +275,6 @@ namespace PaLASOLU
 						Object.DestroyImmediate(director);
 					}
 				}
-
-
 			});
 		}
 
