@@ -111,6 +111,9 @@ namespace PaLASOLU
 				mergedClip.name = "mergedClip";
 				mergedClip.legacy = false;
 
+				AudioVolumeManager.CleanUpVolumeData(lfuState.timeline);
+				AudioTrackVolumeData volumeData = AudioVolumeManager.GetOrCreateVolumeData(lfuState.timeline);
+				
 				foreach (var track in lfuState.timeline.GetOutputTracks())
 				{
 					//Audio Handling
@@ -145,7 +148,19 @@ namespace PaLASOLU
 
 							AudioSource audioSource = audioObject.AddComponent<AudioSource>();
 							audioSource.clip = audioClip;
-							if (lfuState.lfUploader.isAffectedAudioVolume) audioSource.volume = GetTrackVolume(track);
+
+							//Volume Affect
+							if (lfuState.lfUploader.isAffectedAudioVolume)
+							{
+								string trackName = track.name;
+								string clipName = audioPlayableAsset.clip.name;
+								double startTime = nowClip.start;
+
+								AudioTrackVolumeEntity entity = volumeData.entities.Find(e => e.trackName == trackName && e.clipName == clipName && e.start == startTime);
+								float volume = entity != null ? entity.volume : 1.0f;
+
+								audioSource.volume = volume;
+							}
 
 							//AnimationClip Generate
 							EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(audioObject.name);
@@ -309,33 +324,5 @@ namespace PaLASOLU
 
 			return newLayer;
 		}
-
-		//WARNING : Using Internal API!!
-		float GetTrackVolume(TrackAsset track)
-		{
-			SerializedProperty properties = new SerializedObject(track).GetIterator();
-
-			while (properties.NextVisible(true))
-			{
-				if (properties.name == "m_TrackProperties")
-				{
-					var propertiesItr = properties.Copy();
-					var endProperties = propertiesItr.GetEndProperty();
-
-					while (propertiesItr.NextVisible(true) && !SerializedProperty.EqualContents(propertiesItr, endProperties))
-					{
-						if (propertiesItr.name == "volume")
-						{
-							return propertiesItr.floatValue;
-						}
-					}
-					LogMessageSimplifier.PaLog(4, $"Cannot find \"Volume\" property iterator.");
-				}
-			}
-
-			LogMessageSimplifier.PaLog(4, $"Cannot find \"m_TrackProperties\" property.");
-			return 1.0f;
-		}
-
 	}
 }

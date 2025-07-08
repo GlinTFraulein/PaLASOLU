@@ -147,6 +147,8 @@ namespace PaLASOLU
 				}
 			}
 
+			AudioVolumeManager.GetOrCreateVolumeData(timeline);
+
 			//Open Timeline window
 			//WARNING : Using Internal API!!
 			Type typeTimelineWindow = null;
@@ -177,7 +179,7 @@ namespace PaLASOLU
 			}
 		}
 
-		bool CreateDirectory(string path)
+		static bool CreateDirectory(string path)
 		{
 			if (Directory.Exists(path))
 			{
@@ -211,8 +213,6 @@ namespace PaLASOLU
 
 			return value;
 		}
-
-
 	}
 }
 #endif
