@@ -33,7 +33,7 @@ namespace PaLASOLU
 			{
 				LoweffortUploaderState lfuState = ctx.GetState<LoweffortUploaderState>();
 				lfuState.lfUploader = ctx?.AvatarRootObject.GetComponentInChildren<LoweffortUploader>(true);
-				
+
 				LoweffortUploader obj = lfuState.lfUploader;
 				if (obj == null)
 				{
@@ -113,7 +113,7 @@ namespace PaLASOLU
 
 				AudioVolumeManager.CleanUpVolumeData(lfuState.timeline);
 				AudioTrackVolumeData volumeData = AudioVolumeManager.GetOrCreateVolumeData(lfuState.timeline);
-				
+
 				foreach (var track in lfuState.timeline.GetOutputTracks())
 				{
 					//Audio Handling
@@ -194,12 +194,12 @@ namespace PaLASOLU
 						EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(GetRelativePath(activateObjectPath, rootObjectPath));
 
 						AnimationCurve curve = new AnimationCurve();
-						
+
 						foreach (TimelineClip nowClip in clips)
 						{
 							if ((float)nowClip.start != 0f) curve.AddKeySetActive(0f, false);
 							curve.AddKeySetActive((float)nowClip.start, true);
-							curve.AddKeySetActive((float)nowClip.end, false);							
+							curve.AddKeySetActive((float)nowClip.end, false);
 						}
 
 						AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
@@ -235,7 +235,7 @@ namespace PaLASOLU
 						LogMessageSimplifier.PaLog(4, $"[PaLASOLU] Recorded clip is not found.: {clipName}");
 						continue;
 					}
-					
+
 					bool layerExists = controller.layers.Any(layer => layer.name == clipName);
 					if (!layerExists)
 					{
@@ -255,25 +255,49 @@ namespace PaLASOLU
 					rootController = new AnimatorController();
 					rootAnimator.runtimeAnimatorController = rootController;
 				}
-				 
+
 				rootController.AddLayer(SetupNewLayerAndState(mergedClip));
 
+				// GameObject inactivate
+				GameObject parent = director.gameObject.transform.parent.gameObject;
+				if (parent.name == "WorldFixed") parent.SetActive(false);
+			});
+
+			Sequence postProcess = InPhase(BuildPhase.Optimizing);
+			postProcess.BeforePlugin("com.anatawa12.avatar-optimizer");
+			postProcess.Run("PaLASOLU LfUploader Post Process", ctx =>
+			{
+				LoweffortUploaderState lfuState = ctx.GetState<LoweffortUploaderState>();
+				if (lfuState.lfUploader == null) return;
+
+				PlayableDirector director = lfuState.director;
+				if (director == null) return;
+
+				LoweffortUploader lfUploader = lfuState.lfUploader;
+
 				//PlayableDirector Delete
-				if (director != null)
+
+				if (PrefabUtility.IsPartOfPrefabInstance(director))
 				{
-                    GameObject parent = director.gameObject.transform.parent.gameObject;
-                    if (parent.name == "WorldFixed") parent.SetActive(false);
-                    
-					if (PrefabUtility.IsPartOfPrefabInstance(director))
-					{
-						PrefabUtility.RecordPrefabInstancePropertyModifications(director);
-						Object.DestroyImmediate(director, true);
-						LogMessageSimplifier.PaLog(0, "PlayableDirector を Prefab から削除しました。");
-					}
-					else
-					{
-						Object.DestroyImmediate(director);
-					}
+					PrefabUtility.RecordPrefabInstancePropertyModifications(director);
+					Object.DestroyImmediate(director, true);
+					LogMessageSimplifier.PaLog(0, "PlayableDirector を Prefab から削除しました。");
+				}
+				else
+				{
+					Object.DestroyImmediate(director);
+				}
+				
+				//Delete LfUploader (for AAO Compatible)
+				if (PrefabUtility.IsPartOfPrefabInstance(lfUploader))
+				{
+					PrefabUtility.RecordPrefabInstancePropertyModifications(lfUploader);
+					Object.DestroyImmediate(lfUploader, true);
+					LogMessageSimplifier.PaLog(0, "PlayableDirector を Prefab から削除しました。");
+				}
+				else
+				{
+					Object.DestroyImmediate(lfUploader);
 				}
 			});
 		}
