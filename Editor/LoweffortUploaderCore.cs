@@ -111,7 +111,7 @@ namespace PaLASOLU
 				mergedClip.name = "mergedClip";
 				mergedClip.legacy = false;
 
-				AudioVolumeManager.CleanUpVolumeData(lfuState.timeline);
+				//AudioVolumeManager.CleanUpVolumeData(lfuState.timeline);  //多分CleanUpがやりすぎるバグがあるので一旦消しておく
 				AudioTrackVolumeData volumeData = AudioVolumeManager.GetOrCreateVolumeData(lfuState.timeline);
 
 				foreach (var track in lfuState.timeline.GetOutputTracks())
