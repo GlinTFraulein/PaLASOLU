@@ -9,6 +9,7 @@ namespace PaLASOLU
 {
 	[AddComponentMenu("PaLASOLU/PaLASOLU Low-effort Uploader")]
 	[DisallowMultipleComponent]
+	[RequireComponent(typeof(PlayableDirector))]
 	public class LoweffortUploader : MonoBehaviour, IEditorOnly
 	{
 		public PlayableDirector director;
@@ -27,7 +28,6 @@ namespace PaLASOLU
 				Debug.LogWarning("[PaLASOLU] 警告 : Low-effort UploaderをアタッチしたGameObjectには、PlayableDirectorコンポーネントが存在しません！ 後から手動で追加する場合は、高度な設定から追加してください。");
 			}
 		}
-		
 
 		[CustomEditor(typeof(LoweffortUploader))]
 		public class LfUploaderEditor : Editor
@@ -45,7 +45,7 @@ namespace PaLASOLU
 				GUILayout.Space(8);
 
 				LoweffortUploader uploader = (LoweffortUploader)target;
-				EditorGUILayout.HelpBox("このスクリプトとPlayable Directorコンポーネントが同じGameObjectに付いている場合、適切な処理をしてアップロードを行います。", MessageType.Info);
+				EditorGUILayout.HelpBox("このスクリプトとPlayable Directorコンポーネントが同じGameObjectに付いている場合、適切な処理をしてアップロードを行います。\n誤操作防止のために、このスクリプトが付いている場合は、Playable Directorを削除できません。", MessageType.Info);
 
 				if (advancedSettings = EditorGUILayout.Foldout(advancedSettings, "高度な設定"))
 				{
