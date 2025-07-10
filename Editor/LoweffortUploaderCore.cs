@@ -212,13 +212,16 @@ namespace PaLASOLU
 							}
 
 							GameObject prefabObject = GameObject.Instantiate(prefab);
-							prefabObject.transform.SetParent(director.gameObject.transform);    //暫定 本当はParentを取りたい
+							GameObject parentObject = controlPlayableAsset.sourceGameObject.Resolve(director);
+							prefabObject.transform.SetParent(parentObject == null ? director.gameObject.transform : parentObject.transform);
 
 							string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
 							prefabObject.name = $"{prefab.name}_{uniqueId}";
 							prefabObject.SetActive(false);
 
-							GenerateAndBindActivateCurve(mergedClip, nowClip, prefabObject.name);
+							string prefabObjectPath = GetGameObjectPath(prefabObject);
+							string rootObjectPath = GetGameObjectPath(obj.gameObject);
+							GenerateAndBindActivateCurve(mergedClip, nowClip, GetRelativePath(prefabObjectPath, rootObjectPath));
 						}
 					}
 				}
