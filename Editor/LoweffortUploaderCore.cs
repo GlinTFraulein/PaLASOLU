@@ -172,7 +172,7 @@ namespace PaLASOLU
 						List<TimelineClip> clips = track.GetClips().ToList();
 
 						GameObject activateObject = director.GetGenericBinding(track) as GameObject;
-						if (activateObject != null)
+						if (activateObject == null)
 						{
 							LogMessageSimplifier.PaLog(1, $"{track.name} にGameObjectが存在しません。");
 						}
