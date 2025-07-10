@@ -17,7 +17,7 @@ namespace PaLASOLU
 		{
 			if (type == LogType.Error && condition.Contains("Can't remove PlayableDirector because LoweffortUploader"))
 			{
-				LogMessageSimplifier.PaLog(2, "あなたは Playable Director を削除しようとしましたが、削除対象の PlayableDirector は PaLASOLU によって保護されています！もし VRChat へのアップロードであれば、 VRCSDK のエラーを無視してアップロードしてください。\nもし、 Playable Director を削除する必要がある場合は、「PaLASOLU Low-effot Uploader」コンポーネントを先に削除してください。");
+				LogMessageSimplifier.PaLog(2, "あなたは Playable Director を削除しようとしましたが、削除対象の PlayableDirector は PaLASOLU によって保護されています！もし VRChat へのアップロードであれば、 VRCSDK のエラーを無視してアップロードしてください。\nもし、 Playable Director を削除する必要がある場合は、「PaLASOLU Low-effort Uploader」コンポーネントを先に削除してください。");
 				EditorUtility.DisplayDialog(
 					"[PaLASOLU] Low-effort Uploader Alert",
 					"もし VRChat へのアップロードであれば、 VRCSDK のエラーを無視してアップロードしてください！\n\n" + 
