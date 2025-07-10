@@ -9,7 +9,6 @@ namespace PaLASOLU
 {
 	[AddComponentMenu("PaLASOLU/PaLASOLU Low-effort Uploader")]
 	[DisallowMultipleComponent]
-	[RequireComponent(typeof(PlayableDirector))]
 	public class LoweffortUploader : MonoBehaviour, IEditorOnly
 	{
 		public PlayableDirector director;
