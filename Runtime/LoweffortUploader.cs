@@ -8,6 +8,7 @@ using PaLASOLU;
 namespace PaLASOLU
 {
 	[AddComponentMenu("PaLASOLU/PaLASOLU Low-effort Uploader")]
+	[HelpURL("https://glintfraulein.info/docs/PaLASOLU/Document/LoweffortUploader")]
 	[DisallowMultipleComponent]
 	public class LoweffortUploader : MonoBehaviour, IEditorOnly
 	{

@@ -11,6 +11,7 @@ using PaLASOLU;
 
 namespace PaLASOLU
 {
+	[HelpURL("https://glintfraulein.info/docs/PaLASOLU/Document/SetupOptimization")]
 	public class ParticleLiveSetup : EditorWindow
 	{
 		const string basePrefabPath = "Packages/info.glintfraulein.palasolu/Runtime/Prefab/PaLASOLU_Prefab.prefab";
