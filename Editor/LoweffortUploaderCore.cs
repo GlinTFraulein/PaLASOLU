@@ -189,15 +189,13 @@ namespace PaLASOLU
 
 						foreach (TimelineClip nowClip in clips)
 						{
-							if ((float)nowClip.start != 0f) curve.AddKeySetActive(0f, false);
-							curve.AddKeySetActive((float)nowClip.start, true);
-							curve.AddKeySetActive((float)nowClip.end, false);
+							curve.AddKeySingleOnOff((float)nowClip.start, (float)nowClip.end);
 						}
 
 						AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
 					}
 
-                    //Control Handling
+					//Control Handling
 					else if (track is ControlTrack)
 					{
 						List<TimelineClip> clips = track.GetClips().ToList();
@@ -366,9 +364,7 @@ namespace PaLASOLU
 			EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(objectName);
 
 			AnimationCurve curve = new AnimationCurve();
-			if ((float)clip.start != 0f) curve.AddKeySetActive(0f, false);
-			curve.AddKeySetActive((float)clip.start, true);
-			curve.AddKeySetActive((float)clip.end, false);
+			curve.AddKeySingleOnOff((float)clip.start, (float)clip.end);
 
 			AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
 
