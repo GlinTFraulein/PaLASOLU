@@ -162,15 +162,7 @@ namespace PaLASOLU
 								audioSource.volume = volume;
 							}
 
-							//AnimationClip Generate
-							EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(audioObject.name);
-
-							AnimationCurve curve = new AnimationCurve();
-							if ((float)nowClip.start != 0f) curve.AddKeySetActive(0f, false);
-							curve.AddKeySetActive((float)nowClip.start, true);
-							curve.AddKeySetActive((float)nowClip.end, false);
-
-							AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
+							GenerateAndBindActivateCurve(mergedClip, nowClip, audioObject.name);
 						}
 					}
 
@@ -203,6 +195,33 @@ namespace PaLASOLU
 						}
 
 						AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
+					}
+
+                    //Control Handling
+					else if (track is ControlTrack)
+					{
+						List<TimelineClip> clips = track.GetClips().ToList();
+
+						foreach (TimelineClip nowClip in clips)
+						{
+							ControlPlayableAsset controlPlayableAsset = nowClip?.asset as ControlPlayableAsset;
+							GameObject prefab = controlPlayableAsset.prefabGameObject;
+
+							if (prefab == null)
+							{
+								LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} にPrefabが設定されていません。");
+								continue;
+							}
+
+							GameObject prefabObject = GameObject.Instantiate(prefab);
+							prefabObject.transform.SetParent(director.gameObject.transform);    //暫定 本当はParentを取りたい
+
+							string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
+							prefabObject.name = $"{prefab.name}_{uniqueId}";
+							prefabObject.SetActive(false);
+
+							GenerateAndBindActivateCurve(mergedClip, nowClip, prefabObject.name);
+						}
 					}
 				}
 
@@ -340,6 +359,20 @@ namespace PaLASOLU
 			newState.motion = addClip;
 
 			return newLayer;
+		}
+
+		public void GenerateAndBindActivateCurve(AnimationClip mergedClip, TimelineClip clip, string objectName)
+		{
+			EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(objectName);
+
+			AnimationCurve curve = new AnimationCurve();
+			if ((float)clip.start != 0f) curve.AddKeySetActive(0f, false);
+			curve.AddKeySetActive((float)clip.start, true);
+			curve.AddKeySetActive((float)clip.end, false);
+
+			AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
+
+			return;
 		}
 	}
 }
