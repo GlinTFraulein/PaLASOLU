@@ -26,7 +26,7 @@ namespace PaLASOLU
 		bool timelineLockNotice = true;
 		static Texture banner = null;
 
-		[MenuItem("Tools/PaLASOLU/ParticleLive Setup")]
+		[MenuItem("Tools/PaLASOLU/ParticleLive Setup", priority = 200)]
 		static void Init()
 		{
 			GetWindow<ParticleLiveSetup>("Particle Live Setup");
