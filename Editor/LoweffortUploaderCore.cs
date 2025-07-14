@@ -358,7 +358,7 @@ namespace PaLASOLU
 				return null;
 			}
 
-			// Merged Clip
+			// Merge Clip
 			AnimationClip mergedClip = new AnimationClip
 			{
 				name = $"{track.name}_Merged",
@@ -376,31 +376,33 @@ namespace PaLASOLU
 				AnimationClip sourceClip = playableAsset.clip;
 				if (sourceClip == null)
 				{
-					LogMessageSimplifier.PaLog(4, $"TimelineClip {clip.displayName} has no AnimationClip.");
+					LogMessageSimplifier.PaLog(1, $"TimelineClip {clip.displayName} に、 AnimationClip が設定されていません！");
 					continue;
 				}
 
-				// EditorCurveBinding全部取る
+				double startTime = clip.start;
 				EditorCurveBinding[] bindings = AnimationUtility.GetCurveBindings(sourceClip);
+				EditorCurveBinding[] objBindings = AnimationUtility.GetObjectReferenceCurveBindings(sourceClip);
 
 				foreach (EditorCurveBinding binding in bindings)
 				{
 					AnimationCurve curve = AnimationUtility.GetEditorCurve(sourceClip, binding);
 					if (curve == null) continue;
 
-					// キーフレームを開始時間分だけオフセットしてコピー
+					// キーフレームを開始時間分だけオフセットしてコピー これもうちょっとどうにかならないの？？
 					AnimationCurve newCurve = new AnimationCurve();
+					newCurve.preWrapMode = curve.preWrapMode;
+					newCurve.postWrapMode = curve.postWrapMode;
+
 					foreach (Keyframe key in curve.keys)
 					{
-						float newTime = key.time + (float)clip.start;
-						newCurve.AddKey(newTime, key.value);
+						newCurve.AddKey(new Keyframe(key.time + (float)startTime, key.value, key.inTangent, key.outTangent));
 					}
 
-					// 既に同じ binding が存在する場合、結合
 					AnimationCurve existing = AnimationUtility.GetEditorCurve(mergedClip, binding);
 					if (existing != null)
 					{
-						foreach (Keyframe key in newCurve.keys)
+						foreach (var key in newCurve.keys)
 						{
 							existing.AddKey(key);
 						}
@@ -411,6 +413,30 @@ namespace PaLASOLU
 						AnimationUtility.SetEditorCurve(mergedClip, binding, newCurve);
 					}
 				}
+
+				foreach (EditorCurveBinding binding in objBindings)
+				{
+					ObjectReferenceKeyframe[] curve = AnimationUtility.GetObjectReferenceCurve(sourceClip, binding);
+					if (curve == null) continue;
+
+					for (int i = 0; i < curve.Length; i++)
+					{
+						curve[i].time += (float)startTime;
+					}
+
+                    ObjectReferenceKeyframe[] existing = AnimationUtility.GetObjectReferenceCurve(mergedClip, binding);
+                    if (existing != null && existing.Length > 0)
+                    {
+                        //Sort to Time
+                        var merged = existing.Concat(curve).OrderBy(kf => kf.time).ToArray();
+                        AnimationUtility.SetObjectReferenceCurve(mergedClip, binding, merged);
+                    }
+                    else
+                    {
+                        AnimationUtility.SetObjectReferenceCurve(mergedClip, binding, curve);
+                    }
+                }
+
 			}
 
 			LogMessageSimplifier.PaLog(0, $"MergedClip generated: {mergedClip.name}");
