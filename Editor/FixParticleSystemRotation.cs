@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,8 +9,9 @@ namespace PaLASOLU
 	[InitializeOnLoad]
 	public class FixParticleSystemRotation
 	{
-		private static List<int> previousInstanceIDs;
+		private static HashSet<int> previousInstanceIDs;
 		private static bool fixRotate = true;
+		private static bool isQueued;
 		private const string menuPath = "Tools/PaLASOLU/Extensions/Fix rotation for \"Create Particle System\"";
 
 		private class StartUpData : ScriptableSingleton<StartUpData>
@@ -45,28 +47,35 @@ namespace PaLASOLU
 
 		static void OnHierarchyChanged()
 		{
-			if (!fixRotate)
-			{
-				previousInstanceIDs = GetCurrentHierarchyIDs();
-				return;
-			}
+			if (!fixRotate) return;
+			if (isQueued) return;
 
-			var currentIDs = GetCurrentHierarchyIDs();
-			var newIDs = currentIDs.Except(previousInstanceIDs).ToList();
+			isQueued = true;
+			EditorApplication.delayCall += ProcessHierarchyChanges;
 
-			foreach (var id in newIDs)
+		}
+		private static void ProcessHierarchyChanges()
+		{
+			isQueued = false;
+
+			HashSet<int> currentIDs = GetCurrentHierarchyIDs();
+			HashSet<int> newIDs = currentIDs.Except(previousInstanceIDs).ToHashSet();
+
+			foreach (int id in newIDs)
 			{
-				var obj = EditorUtility.InstanceIDToObject(id) as GameObject;
+				GameObject obj = EditorUtility.InstanceIDToObject(id) as GameObject;
 				if (obj == null) continue;
 
-				var ps = obj.GetComponent<ParticleSystem>();
+				ParticleSystem ps = obj.GetComponent<ParticleSystem>();
 				if (ps == null) continue;
-				if (!obj.name.StartsWith("Particle System")) continue;
 
-				var renderer = obj.GetComponent<ParticleSystemRenderer>();
+				Regex regex = new Regex("Particle System \\(\\d+\\)");
+				if (!regex.IsMatch(obj.name)) continue;
+
+				ParticleSystemRenderer renderer = obj.GetComponent<ParticleSystemRenderer>();
 				if (renderer != null && renderer.sharedMaterial != null)
 				{
-                    var materialName = renderer.sharedMaterial.name;
+					string materialName = renderer.sharedMaterial.name;
 					if (materialName != ("Default-ParticleSystem")) continue;
 				}
 
@@ -75,7 +84,7 @@ namespace PaLASOLU
 				// 条件をすべて通ったら修正
 				Undo.RecordObject(obj.transform, "Fix ParticleSystem Rotation");
 
-				var rot = obj.transform.localEulerAngles;
+				Vector3 rot = obj.transform.localEulerAngles;
 				rot.x = 0f;
 				obj.transform.localEulerAngles = rot;
 			}
@@ -83,12 +92,12 @@ namespace PaLASOLU
 			previousInstanceIDs = currentIDs;
 		}
 
-		static List<int> GetCurrentHierarchyIDs()
+		private static HashSet<int> GetCurrentHierarchyIDs()
 		{
 			return GameObject.FindObjectsOfType<GameObject>()
 				.Where(go => go.scene.IsValid())
 				.Select(go => go.GetInstanceID())
-				.ToList();
+				.ToHashSet();
 		}
 	}
 }
