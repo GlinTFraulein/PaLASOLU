@@ -381,6 +381,12 @@ namespace PaLASOLU
 				}
 
 				double startTime = clip.start;
+				double endTime = clip.end;
+				bool isLoop = IsLoopingTimelineClip(clip);
+				double clipLength = sourceClip.length;
+				double timelineLength = clip.duration;
+				int loopCount = IsLoopingTimelineClip(clip) ? Mathf.CeilToInt((float)(timelineLength / clipLength)) : 1;
+
 				EditorCurveBinding[] bindings = AnimationUtility.GetCurveBindings(sourceClip);
 				EditorCurveBinding[] objBindings = AnimationUtility.GetObjectReferenceCurveBindings(sourceClip);
 
@@ -389,15 +395,53 @@ namespace PaLASOLU
 					AnimationCurve curve = AnimationUtility.GetEditorCurve(sourceClip, binding);
 					if (curve == null) continue;
 
-					// キーフレームを開始時間分だけオフセットしてコピー これもうちょっとどうにかならないの？？
+					// キーフレームを開始時間分だけオフセットしてコピー
 					AnimationCurve newCurve = new AnimationCurve();
 					newCurve.preWrapMode = curve.preWrapMode;
 					newCurve.postWrapMode = curve.postWrapMode;
 
-					foreach (Keyframe key in curve.keys)
+					List<Keyframe> allKeys = new List<Keyframe>();
+
+					for (int loop = 0; loop < loopCount; loop++)
 					{
-						newCurve.AddKey(new Keyframe(key.time + (float)startTime, key.value, key.inTangent, key.outTangent));
+						double loopedPart = loop * clipLength;
+						
+						foreach (Keyframe key in curve.keys)
+						{
+							float newTime = key.time + (float)startTime + (float)loopedPart;
+							allKeys.Add(new Keyframe(newTime, key.value, key.inTangent, key.outTangent));
+						}
 					}
+
+					if (timelineLength % clipLength > 0.0001) //ちょうどループしない時
+					{
+						float evalTime = (float)endTime;
+						if (evalTime > sourceClip.length) evalTime = evalTime % sourceClip.length;
+
+						float value = curve.Evaluate(evalTime);
+						/*
+						 * TODO : Tangent補完
+						float tangent = 0;
+						
+						if (curve.length >= 2)
+						{
+							for (int i = 0; i < curve.length - 1; i++)
+							{
+								if (curve.keys[i].time <= evalTime && evalTime <= curve.keys[i + 1].time)
+								{
+									var k0 = curve.keys[i];
+									var k1 = curve.keys[i + 1];
+									tangent = (k1.value - k0.value) / (k1.time - k0.time);
+									break;
+								}
+							}
+						}*/
+
+						allKeys.Add(new Keyframe((float)endTime, value));
+					}
+
+					List<Keyframe> validKeys = allKeys.Where(k => k.time <= endTime).ToList();
+					newCurve.keys = validKeys.ToArray();
 
 					AnimationCurve existing = AnimationUtility.GetEditorCurve(mergedClip, binding);
 					if (existing != null)
@@ -419,28 +463,69 @@ namespace PaLASOLU
 					ObjectReferenceKeyframe[] curve = AnimationUtility.GetObjectReferenceCurve(sourceClip, binding);
 					if (curve == null) continue;
 
-					for (int i = 0; i < curve.Length; i++)
+					List<ObjectReferenceKeyframe> newKeys = new List<ObjectReferenceKeyframe>();
+					
+					foreach (ObjectReferenceKeyframe originalKey in curve)
 					{
-						curve[i].time += (float)startTime;
+						for (int loop = 0; loop < loopCount; loop++)
+						{
+							float newTime = originalKey.time + (float)startTime + (float)clipLength * loop;
+							if (newTime > endTime) continue;
+
+							newKeys.Add(new ObjectReferenceKeyframe
+							{
+								time = newTime,
+								value = originalKey.value
+							});
+						}
 					}
 
-                    ObjectReferenceKeyframe[] existing = AnimationUtility.GetObjectReferenceCurve(mergedClip, binding);
-                    if (existing != null && existing.Length > 0)
-                    {
-                        //Sort to Time
-                        var merged = existing.Concat(curve).OrderBy(kf => kf.time).ToArray();
-                        AnimationUtility.SetObjectReferenceCurve(mergedClip, binding, merged);
-                    }
-                    else
-                    {
-                        AnimationUtility.SetObjectReferenceCurve(mergedClip, binding, curve);
-                    }
-                }
+					ObjectReferenceKeyframe[] existing = AnimationUtility.GetObjectReferenceCurve(mergedClip, binding);
+					if (existing != null && existing.Length > 0)
+					{
+						//Sort to Time
+						var merged = existing.Concat(newKeys).OrderBy(kf => kf.time).ToArray();
+						AnimationUtility.SetObjectReferenceCurve(mergedClip, binding, merged);
+					}
+					else
+					{
+						AnimationUtility.SetObjectReferenceCurve(mergedClip, binding, newKeys.ToArray());
+					}
+				}
 
 			}
 
 			LogMessageSimplifier.PaLog(0, $"MergedClip generated: {mergedClip.name}");
 			return mergedClip;
+		}
+
+		public static bool IsLoopingTimelineClip(TimelineClip clip)
+		{
+			PlayableAsset playableAsset = clip.asset as PlayableAsset;
+			AnimationPlayableAsset animPlayable = playableAsset as AnimationPlayableAsset;
+			AudioPlayableAsset audioPlayable = playableAsset as AudioPlayableAsset;
+			if ((playableAsset is not AnimationPlayableAsset) && (playableAsset is not AudioPlayableAsset))
+			{
+				return false;
+			}
+
+			bool capsAllowLoop = (clip.clipCaps & ClipCaps.Looping) != 0;
+			bool assetAllowLoop = false;
+
+			if (playableAsset is AnimationPlayableAsset)
+			{
+				bool sourceAssetLoop = animPlayable.clip.isLooping;
+				bool assetLoop = (animPlayable.loop == AnimationPlayableAsset.LoopMode.On) || (animPlayable.loop == AnimationPlayableAsset.LoopMode.UseSourceAsset && sourceAssetLoop);
+
+				assetAllowLoop = assetLoop;
+			}
+
+			if (playableAsset is AudioPlayableAsset)
+			{
+				assetAllowLoop = audioPlayable.loop;
+			}
+
+			return capsAllowLoop && assetAllowLoop;
 		}
 	}
 }
