@@ -81,14 +81,15 @@ namespace PaLASOLU
 					{
 						AnimationTrack animationTrack = track as AnimationTrack;
 						var animator = director.GetGenericBinding(track) as Animator;
-						if (animator == null) continue;
-
-						var infiniteClip = animationTrack.infiniteClip;
-						if (infiniteClip == null) continue;
+						if (animator == null)
+						{
+							LogMessageSimplifier.PaLog(1, $"トラック {track.name} にAnimatorが設定されていません！Timelineが正しく再生されない可能性があります。");
+							continue;
+						}
 
 						//animatorObjectは紐付けられているGameObjectを取る(AnimatorはNDMFで一度削除されるため)
 						GameObject animatorObject = animator.gameObject;
-						bindings[infiniteClip.name] = animatorObject;
+						bindings[track.name] = animatorObject;
 					}
 				}
 			});
@@ -107,17 +108,31 @@ namespace PaLASOLU
 				PlayableDirector director = lfuState.director;
 				if (director == null) return;
 
-				AnimationClip mergedClip = new AnimationClip();
+                Dictionary<string, GameObject> bindings = lfuState.bindings;
+                if (bindings == null) return;
+
+                AnimationClip mergedClip = new AnimationClip();
 				mergedClip.name = "mergedClip";
 				mergedClip.legacy = false;
 
+				List<(AnimationClip addAnim, GameObject addObject)> addClips = new List<(AnimationClip, GameObject)>();
+				
 				//AudioVolumeManager.CleanUpVolumeData(lfuState.timeline);  //多分CleanUpがやりすぎるバグがあるので一旦消しておく
 				AudioTrackVolumeData volumeData = AudioVolumeManager.GetOrCreateVolumeData(lfuState.timeline);
 
-				foreach (var track in lfuState.timeline.GetOutputTracks())
+				foreach (TrackAsset track in lfuState.timeline.GetOutputTracks())
 				{
+					//Animation Handling
+					if (track is AnimationTrack)
+					{
+                        AnimationClip sumOfClip = (track as AnimationTrack).infiniteClip;
+						if (sumOfClip == null) sumOfClip = BakeAnimationTrackToMergedClip(track);
+
+                        addClips.Add((sumOfClip, bindings[track.name]));
+					}
+
 					//Audio Handling
-					if (track is AudioTrack && obj.generateAudioObject)
+					else if (track is AudioTrack && obj.generateAudioObject)
 					{
 						List<TimelineClip> clips = track.GetClips().ToList();
 
@@ -226,57 +241,26 @@ namespace PaLASOLU
 					}
 				}
 
-				//Animator Setup (for AnimationClips)
-				Dictionary<string, GameObject> bindings = lfuState.bindings;
-				if (bindings == null) return;
+				addClips.Add((mergedClip, obj.gameObject));
 
-				if (lfuState.recordedClips == null) return;
+                //Animator Setup
+                foreach(var addClip in addClips)
+                {
+                    AnimationClip addAnimation = addClip.addAnim;
+                    GameObject addGameObject = addClip.addObject;
 
-				foreach (var binding in bindings)
-				{
-					//Get Animator
-					string clipName = binding.Key;
-					GameObject animatorObject = binding.Value;
+                    Animator addAnimator = addGameObject?.GetComponent<Animator>();
+                    if (addAnimator == null) addAnimator = addGameObject.AddComponent<Animator>();
 
-					Transform animatorTransform = animatorObject.transform;
-					Animator animator = animatorTransform?.GetComponent<Animator>();
+                    AnimatorController addController = addAnimator?.runtimeAnimatorController as AnimatorController;
+                    if (addController == null)
+                    {
+                        addController = new AnimatorController();
+                        addAnimator.runtimeAnimatorController = addController;
+                    }
 
-					//Generate
-					AnimatorController controller = animator.runtimeAnimatorController as AnimatorController;
-					if (controller == null)
-					{
-						controller = new AnimatorController();
-						animator.runtimeAnimatorController = controller;
-					}
-
-					AnimationClip clip = lfuState.recordedClips.FirstOrDefault(c => c.name == clipName);  //前から名称一致で探している
-					if (clip == null)
-					{
-						LogMessageSimplifier.PaLog(4, $"[PaLASOLU] Recorded clip is not found.: {clipName}");
-						continue;
-					}
-
-					bool layerExists = controller.layers.Any(layer => layer.name == clipName);
-					if (!layerExists)
-					{
-						controller.AddLayer(SetupNewLayerAndState(clip));
-					}
-				}
-
-				//Animator Setup 2 (for mergedClip)
-				Animator rootAnimator = obj?.gameObject.GetComponent<Animator>();
-				if (rootAnimator == null)
-				{
-					rootAnimator = obj.gameObject.AddComponent<Animator>();
-				}
-				AnimatorController rootController = rootAnimator?.runtimeAnimatorController as AnimatorController;
-				if (rootController == null)
-				{
-					rootController = new AnimatorController();
-					rootAnimator.runtimeAnimatorController = rootController;
-				}
-
-				rootController.AddLayer(SetupNewLayerAndState(mergedClip));
+                    addController.AddLayer(SetupNewLayerAndState(addAnimation));
+                }
 
 				// GameObject inactivate
 				GameObject parent = director.gameObject.transform.parent.gameObject;
@@ -372,6 +356,80 @@ namespace PaLASOLU
 			AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
 
 			return;
+		}
+
+		public static AnimationClip BakeAnimationTrackToMergedClip(TrackAsset track)
+		{
+			if (track is not AnimationTrack animationTrack)
+			{
+				LogMessageSimplifier.PaLog(5, "Track is not an AnimationTrack!");
+				return null;
+			}
+
+			TimelineClip[] timelineClips = animationTrack.GetClips().ToArray();
+			if (timelineClips.Length == 0)
+			{
+				LogMessageSimplifier.PaLog(1, $"{track.name} トラックには、アニメーションデータがありません！");
+				return null;
+			}
+
+			// Merged Clip
+			AnimationClip mergedClip = new AnimationClip
+			{
+				name = $"{track.name}_Merged",
+				legacy = false
+			};
+
+			foreach (TimelineClip clip in timelineClips)
+			{
+				if (clip.asset is not AnimationPlayableAsset playableAsset)
+				{
+					LogMessageSimplifier.PaLog(4, $"TimelineClip {clip.displayName} is not an AnimationPlayableAsset.");
+					continue;
+				}
+
+				AnimationClip sourceClip = playableAsset.clip;
+				if (sourceClip == null)
+				{
+					LogMessageSimplifier.PaLog(4, $"TimelineClip {clip.displayName} has no AnimationClip.");
+					continue;
+				}
+
+				// EditorCurveBinding全部取る
+				EditorCurveBinding[] bindings = AnimationUtility.GetCurveBindings(sourceClip);
+
+				foreach (EditorCurveBinding binding in bindings)
+				{
+					AnimationCurve curve = AnimationUtility.GetEditorCurve(sourceClip, binding);
+					if (curve == null) continue;
+
+					// キーフレームを開始時間分だけオフセットしてコピー
+					AnimationCurve newCurve = new AnimationCurve();
+					foreach (Keyframe key in curve.keys)
+					{
+						float newTime = key.time + (float)clip.start;
+						newCurve.AddKey(newTime, key.value);
+					}
+
+					// 既に同じ binding が存在する場合、結合
+					AnimationCurve existing = AnimationUtility.GetEditorCurve(mergedClip, binding);
+					if (existing != null)
+					{
+						foreach (Keyframe key in newCurve.keys)
+						{
+							existing.AddKey(key);
+						}
+						AnimationUtility.SetEditorCurve(mergedClip, binding, existing);
+					}
+					else
+					{
+						AnimationUtility.SetEditorCurve(mergedClip, binding, newCurve);
+					}
+				}
+			}
+
+			LogMessageSimplifier.PaLog(0, $"MergedClip generated: {mergedClip.name}");
+			return mergedClip;
 		}
 	}
 }
