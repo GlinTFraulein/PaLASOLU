@@ -19,7 +19,6 @@ namespace PaLASOLU
 
 		public PlayableDirector director;
 		public TimelineAsset timeline;
-		public List<AnimationClip> recordedClips;
 		public Dictionary<string, GameObject> bindings;
 	}
 
@@ -49,7 +48,6 @@ namespace PaLASOLU
 					return;
 				}
 
-				//RecordedClip Binding
 				lfuState.timeline = director?.playableAsset as TimelineAsset;
 				TimelineAsset timeline = lfuState.timeline;
 				if (timeline == null)
@@ -58,20 +56,7 @@ namespace PaLASOLU
 					return;
 				}
 
-				//"Recorded" clips extraction
-				string timelinePath = AssetDatabase.GetAssetPath(timeline);
-				Object[] subAssets = AssetDatabase.LoadAllAssetsAtPath(timelinePath);
-				lfuState.recordedClips = new List<AnimationClip>();
-				List<AnimationClip> recordedClips = lfuState.recordedClips;
-				foreach (var asset in subAssets)
-				{
-					if (asset is AnimationClip clip)
-					{
-						recordedClips.Add(clip);
-					}
-				}
-
-				//Animation Handling
+				//Animator Handling
 				lfuState.bindings = new Dictionary<string, GameObject>();
 				Dictionary<string, GameObject> bindings = lfuState.bindings;
 
@@ -108,10 +93,10 @@ namespace PaLASOLU
 				PlayableDirector director = lfuState.director;
 				if (director == null) return;
 
-                Dictionary<string, GameObject> bindings = lfuState.bindings;
-                if (bindings == null) return;
+				Dictionary<string, GameObject> bindings = lfuState.bindings;
+				if (bindings == null) return;
 
-                AnimationClip mergedClip = new AnimationClip();
+				AnimationClip mergedClip = new AnimationClip();
 				mergedClip.name = "mergedClip";
 				mergedClip.legacy = false;
 
@@ -125,10 +110,10 @@ namespace PaLASOLU
 					//Animation Handling
 					if (track is AnimationTrack)
 					{
-                        AnimationClip sumOfClip = (track as AnimationTrack).infiniteClip;
+						AnimationClip sumOfClip = (track as AnimationTrack).infiniteClip;
 						if (sumOfClip == null) sumOfClip = BakeAnimationTrackToMergedClip(track);
 
-                        addClips.Add((sumOfClip, bindings[track.name]));
+						addClips.Add((sumOfClip, bindings[track.name]));
 					}
 
 					//Audio Handling
@@ -243,24 +228,24 @@ namespace PaLASOLU
 
 				addClips.Add((mergedClip, obj.gameObject));
 
-                //Animator Setup
-                foreach(var addClip in addClips)
-                {
-                    AnimationClip addAnimation = addClip.addAnim;
-                    GameObject addGameObject = addClip.addObject;
+				//Animator Setup
+				foreach(var addClip in addClips)
+				{
+					AnimationClip addAnimation = addClip.addAnim;
+					GameObject addGameObject = addClip.addObject;
 
-                    Animator addAnimator = addGameObject?.GetComponent<Animator>();
-                    if (addAnimator == null) addAnimator = addGameObject.AddComponent<Animator>();
+					Animator addAnimator = addGameObject?.GetComponent<Animator>();
+					if (addAnimator == null) addAnimator = addGameObject.AddComponent<Animator>();
 
-                    AnimatorController addController = addAnimator?.runtimeAnimatorController as AnimatorController;
-                    if (addController == null)
-                    {
-                        addController = new AnimatorController();
-                        addAnimator.runtimeAnimatorController = addController;
-                    }
+					AnimatorController addController = addAnimator?.runtimeAnimatorController as AnimatorController;
+					if (addController == null)
+					{
+						addController = new AnimatorController();
+						addAnimator.runtimeAnimatorController = addController;
+					}
 
-                    addController.AddLayer(SetupNewLayerAndState(addAnimation));
-                }
+					addController.AddLayer(SetupNewLayerAndState(addAnimation));
+				}
 
 				// GameObject inactivate
 				GameObject parent = director.gameObject.transform.parent.gameObject;

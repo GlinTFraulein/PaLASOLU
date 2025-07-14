@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace PaLASOLU
@@ -35,12 +34,11 @@ namespace PaLASOLU
 			return binding;
 		}
 
-        public static void AddKeySingleOnOff(this AnimationCurve self, float startTime, float endTime)
-        {
-            if (startTime != 0f) self.AddKeySetActive(0f, false);
-            self.AddKeySetActive(startTime, true);
-            self.AddKeySetActive(endTime, false);
-        }
+		public static void AddKeySingleOnOff(this AnimationCurve self, float startTime, float endTime)
+		{
+			if (startTime != 0f) self.AddKeySetActive(0f, false);
+			self.AddKeySetActive(startTime, true);
+			self.AddKeySetActive(endTime, false);
+		}
 	}
 }
-#endif
