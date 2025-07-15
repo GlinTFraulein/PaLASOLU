@@ -41,19 +41,19 @@ namespace PaLASOLU
 			self.AddKeySetActive(endTime, false);
 		}
 
-        public static void CopyCurveWithOffset(AnimationClip sourceClip, AnimationClip destClip, EditorCurveBinding binding, double offset)
-        {
-            var sourceCurve = AnimationUtility.GetEditorCurve(sourceClip, binding);
-            if (sourceCurve == null) return;
+		public static void CopyCurveWithOffset(AnimationClip sourceClip, AnimationClip destClip, EditorCurveBinding binding, double offset)
+		{
+			var sourceCurve = AnimationUtility.GetEditorCurve(sourceClip, binding);
+			if (sourceCurve == null) return;
 
-            var newCurve = new AnimationCurve();
-            foreach (var key in sourceCurve.keys)
-            {
-                float newTime = key.time + (float)offset;
-                newCurve.AddKey(newTime, key.value);
-            }
+			var newCurve = new AnimationCurve();
+			foreach (var key in sourceCurve.keys)
+			{
+				float newTime = key.time + (float)offset;
+				newCurve.AddKey(newTime, key.value);
+			}
 
-            AnimationUtility.SetEditorCurve(destClip, binding, newCurve);
-        }
-    }
+			AnimationUtility.SetEditorCurve(destClip, binding, newCurve);
+		}
+	}
 }

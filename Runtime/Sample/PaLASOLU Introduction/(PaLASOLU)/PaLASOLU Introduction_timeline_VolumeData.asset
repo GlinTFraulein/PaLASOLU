@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: PaLASOLU Introduction_timeline_VolumeData
+  m_EditorClassIdentifier: info.glintfraulein.palasolu.editor:PaLASOLU:AudioTrackVolumeData
+  entities:
+  - trackName: Audio Track
+    clipName: PaLASOLU
+    start: 0
+    volume: 0.5
+  - trackName: Audio Track (1)
+    clipName: PaLASOLU_senden_voice
+    start: 0
+    volume: 1
