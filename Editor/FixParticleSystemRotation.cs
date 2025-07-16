@@ -69,7 +69,7 @@ namespace PaLASOLU
 				ParticleSystem ps = obj.GetComponent<ParticleSystem>();
 				if (ps == null) continue;
 
-				Regex regex = new Regex("Particle System \\(\\d+\\)");
+				Regex regex = new Regex("Particle System(?: \\(\\d+\\))?");
 				if (!regex.IsMatch(obj.name)) continue;
 
 				ParticleSystemRenderer renderer = obj.GetComponent<ParticleSystemRenderer>();
