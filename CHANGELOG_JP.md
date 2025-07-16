@@ -30,6 +30,10 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 脆弱性
 
+## [1.1.1] - [2025-07-17]
+### 修正
+- Fix rotation for "Create Particle System"において、"Particle System"を生成した場合にうまく働かなかった問題を修正
+
 ## [1.1.0] - [2025-07-15] - GlinTFraulein's Birthday Update!
 ### 追加
 - Low-effort UploaderがAnimationClipを置いた状態のAnimationTrackに対応(暫定)
