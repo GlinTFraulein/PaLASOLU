@@ -244,7 +244,7 @@ namespace PaLASOLU
 						addAnimator.runtimeAnimatorController = addController;
 					}
 
-					addController.AddLayer(SetupNewLayerAndState(addAnimation));
+					if (addAnimation != null) addController.AddLayer(SetupNewLayerAndState(addAnimation));
 				}
 
 				// GameObject inactivate
