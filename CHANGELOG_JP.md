@@ -15,6 +15,8 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
   - その他、Timelineを使いやすくする様々な機能
 - Timelineチュートリアル
 - Export Prefab without Timeline
+- Infinite Clip Baker
+- Avatar Root Motion(Action Layer / not-VRChatAvatar Animator)
 
 ### 変更
 - AudioClip.Create()を用いて、元のAudioClipのLoadInBackgroundを変更しないようにする
@@ -29,6 +31,10 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - (PaLASOLUの非推奨ではなく、PaLASOLUからPlayableDirectorへの"非推奨の要求"として、)Playable Track, Signal Track対応はVRC AvatarにScriptを含めることができないので、対応予定がありません
 
 ### 脆弱性
+
+## [1.1.2] - [2025-08-01]
+### 修正
+- Low-effort Uploaderが空のAnimationTrackに対してエラーを吐く場合があった問題を修正
 
 ## [1.1.1] - [2025-07-17]
 ### 修正
