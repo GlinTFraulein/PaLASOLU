@@ -3,7 +3,7 @@
 
 for VRChat Avatar Particle Live!
 
-Readme : https://glintfraulein.info/docs/PaLASOLU
+Readme : [https://glintfraulein.info/PaLASOLU](https://glintfraulein.info/PaLASOLU)
 
 ## Setup Optimization
 3クリック程度で、パーティクルライブ向けの設定済みPrefabを生成します。
