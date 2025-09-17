@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using nadena.dev.ndmf;
+using nadena.dev.ndmf.fluent;
+using PaLASOLU;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
-using UnityEngine.Timeline;
 using UnityEngine.Playables;
-using nadena.dev.ndmf;
-using nadena.dev.ndmf.fluent;
-using PaLASOLU;
+using UnityEngine.Timeline;
 
 [assembly: ExportsPlugin(typeof(LoweffortUploaderCore))]
 
@@ -229,7 +229,7 @@ namespace PaLASOLU
 				addClips.Add((mergedClip, obj.gameObject));
 
 				//Animator Setup
-				foreach(var addClip in addClips)
+				foreach (var addClip in addClips)
 				{
 					AnimationClip addAnimation = addClip.addAnim;
 					GameObject addGameObject = addClip.addObject;
@@ -276,7 +276,7 @@ namespace PaLASOLU
 				{
 					Object.DestroyImmediate(director);
 				}
-				
+
 				//Delete LfUploader (for AAO Compatible)
 				if (PrefabUtility.IsPartOfPrefabInstance(lfUploader))
 				{
@@ -405,7 +405,7 @@ namespace PaLASOLU
 					for (int loop = 0; loop < loopCount; loop++)
 					{
 						double loopedPart = loop * clipLength;
-						
+
 						foreach (Keyframe key in curve.keys)
 						{
 							float newTime = key.time + (float)startTime + (float)loopedPart;
@@ -464,7 +464,7 @@ namespace PaLASOLU
 					if (curve == null) continue;
 
 					List<ObjectReferenceKeyframe> newKeys = new List<ObjectReferenceKeyframe>();
-					
+
 					foreach (ObjectReferenceKeyframe originalKey in curve)
 					{
 						for (int loop = 0; loop < loopCount; loop++)
