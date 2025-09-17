@@ -7,7 +7,7 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 
 ### 追加
-- AudioTrackの途中再生に対応 (できるのか？) ← だいぶしんどい実装になりそうということが判明
+- AudioTrackの途中再生に対応 (できるのか？) ← できそう
 - TimelineExtension
   - BPM基準でタイムラインを触れるようにする
   - GameObjectの名称変更にAnimationが追従するようにする
@@ -17,6 +17,7 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - Export Prefab without Timeline
 - Infinite Clip Baker
 - Avatar Root Motion(Action Layer / not-VRChatAvatar Animator)
+- Particle Curve Inverter - ParticleCurveを上下/左右反転させる機能
 
 ### 変更
 - AudioClip.Create()を用いて、元のAudioClipのLoadInBackgroundを変更しないようにする
@@ -31,6 +32,11 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - (PaLASOLUの非推奨ではなく、PaLASOLUからPlayableDirectorへの"非推奨の要求"として、)Playable Track, Signal Track対応はVRC AvatarにScriptを含めることができないので、対応予定がありません
 
 ### 脆弱性
+
+## [1.1.3] - [2025-09-16]
+### 修正
+- Low-effort Uploaderが、Timeline上のmute状態に関わらず非muteとしてアップロードを行っていた問題を修正
+- Low-effort Uploaderが、1つのアバターに2つ以上存在した場合にうまくアップロードできなかった問題を修正
 
 ## [1.1.2] - [2025-08-01]
 ### 修正
