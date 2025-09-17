@@ -101,12 +101,14 @@ namespace PaLASOLU
 				mergedClip.legacy = false;
 
 				List<(AnimationClip addAnim, GameObject addObject)> addClips = new List<(AnimationClip, GameObject)>();
-				
+
 				//AudioVolumeManager.CleanUpVolumeData(lfuState.timeline);  //多分CleanUpがやりすぎるバグがあるので一旦消しておく
 				AudioTrackVolumeData volumeData = AudioVolumeManager.GetOrCreateVolumeData(lfuState.timeline);
 
 				foreach (TrackAsset track in lfuState.timeline.GetOutputTracks())
 				{
+					if (track.muted) continue;
+
 					//Animation Handling
 					if (track is AnimationTrack)
 					{
