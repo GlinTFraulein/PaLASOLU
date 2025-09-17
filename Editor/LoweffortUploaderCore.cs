@@ -15,8 +15,12 @@ namespace PaLASOLU
 {
 	internal class LoweffortUploaderState
 	{
-		public LoweffortUploader lfUploader { get; set; }
+		public List<LoweffortUploaderContext> Uploaders { get; set; } = new();
+	}
 
+	internal class LoweffortUploaderContext
+	{
+		public LoweffortUploader lfUploader;
 		public PlayableDirector director;
 		public TimelineAsset timeline;
 		public Dictionary<string, GameObject> bindings;
@@ -31,50 +35,54 @@ namespace PaLASOLU
 			preProcess.Run("PaLASOLU LfUploader Pre Process", ctx =>
 			{
 				LoweffortUploaderState lfuState = ctx.GetState<LoweffortUploaderState>();
-				lfuState.lfUploader = ctx?.AvatarRootObject.GetComponentInChildren<LoweffortUploader>(true);
+				HashSet<TimelineAsset> seenTimelines = new HashSet<TimelineAsset>();
 
-				LoweffortUploader obj = lfuState.lfUploader;
-				if (obj == null)
+				foreach (LoweffortUploader lfUploader_finded in ctx?.AvatarRootObject.GetComponentsInChildren<LoweffortUploader>(true))
 				{
-					LogMessageSimplifier.PaLog(0, "PaLASOLU Low-effort Uploader is not found.");
-					return;
-				}
-
-				lfuState.director = obj?.director;
-				PlayableDirector director = lfuState.director;
-				if (director == null)
-				{
-					LogMessageSimplifier.PaLog(2, "PaLASOLU Low-effort Uploader に PlayableDirector コンポーネントが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PaLASOLU Low-eoofrt Uploader コンポーネント内の、「高度な設定」から Playable Director がNoneでないことを確認してください。");
-					return;
-				}
-
-				lfuState.timeline = director?.playableAsset as TimelineAsset;
-				TimelineAsset timeline = lfuState.timeline;
-				if (timeline == null)
-				{
-					LogMessageSimplifier.PaLog(2, "PlayableDirector に Timeline Asset アセットが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PlayableDirector コンポーネント内の、 Playable が None でないことを確認してください。");
-					return;
-				}
-
-				//Animator Handling
-				lfuState.bindings = new Dictionary<string, GameObject>();
-				Dictionary<string, GameObject> bindings = lfuState.bindings;
-
-				foreach (var track in timeline.GetOutputTracks())
-				{
-					if (track is AnimationTrack)
+					PlayableDirector director_finded = lfUploader_finded.director;
+					if (director_finded == null)
 					{
-						AnimationTrack animationTrack = track as AnimationTrack;
-						var animator = director.GetGenericBinding(track) as Animator;
+						LogMessageSimplifier.PaLog(2, "PaLASOLU Low-effort Uploader に PlayableDirector コンポーネントが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PaLASOLU Low-eoofrt Uploader コンポーネント内の、「高度な設定」から Playable Director がNoneでないことを確認してください。");
+						continue;
+					}
+
+					TimelineAsset timeline_finded = lfUploader_finded.timeline;
+					if (timeline_finded == null)
+					{
+						LogMessageSimplifier.PaLog(2, "PlayableDirector に Timeline Asset アセットが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PlayableDirector コンポーネント内の、 Playable が None でないことを確認してください。");
+						continue;
+					}
+
+					if (!seenTimelines.Add(timeline_finded))
+					{
+						LogMessageSimplifier.PaLog(1, $"Timeline {timeline_finded.name} は複数の LoweffortUploader から参照されています。 {lfUploader_finded.name} の処理はスキップされます。");
+						continue;
+					}
+
+					LoweffortUploaderContext uploaderCtx = new LoweffortUploaderContext
+					{
+						lfUploader = lfUploader_finded,
+						director = director_finded,
+						timeline = timeline_finded,
+						bindings = new Dictionary<string, GameObject>()
+					};
+
+					lfuState.Uploaders.Add(uploaderCtx);
+				}
+
+				foreach (LoweffortUploaderContext lfuCtx in lfuState.Uploaders)
+				{
+					//Animator Handling
+					foreach (var track in lfuCtx.timeline.GetOutputTracks().OfType<AnimationTrack>())
+					{
+						var animator = lfuCtx.director.GetGenericBinding(track) as Animator;
 						if (animator == null)
 						{
 							LogMessageSimplifier.PaLog(1, $"トラック {track.name} にAnimatorが設定されていません！Timelineが正しく再生されない可能性があります。");
 							continue;
 						}
-
 						//animatorObjectは紐付けられているGameObjectを取る(AnimatorはNDMFで一度削除されるため)
-						GameObject animatorObject = animator.gameObject;
-						bindings[track.name] = animatorObject;
+						else lfuCtx.bindings[track.name] = animator.gameObject;
 					}
 				}
 			});
@@ -83,175 +91,179 @@ namespace PaLASOLU
 			coreProcess.Run("PaLASOLU LfUploder Core Process", ctx =>
 			{
 				LoweffortUploaderState lfuState = ctx.GetState<LoweffortUploaderState>();
-				if (lfuState.lfUploader == null) return;
 
-				LoweffortUploader obj = lfuState?.lfUploader;
-				if (obj == null) return;
-
-				if (lfuState.timeline == null) return;
-
-				PlayableDirector director = lfuState.director;
-				if (director == null) return;
-
-				Dictionary<string, GameObject> bindings = lfuState.bindings;
-				if (bindings == null) return;
-
-				AnimationClip mergedClip = new AnimationClip();
-				mergedClip.name = "mergedClip";
-				mergedClip.legacy = false;
-
-				List<(AnimationClip addAnim, GameObject addObject)> addClips = new List<(AnimationClip, GameObject)>();
-
-				//AudioVolumeManager.CleanUpVolumeData(lfuState.timeline);  //多分CleanUpがやりすぎるバグがあるので一旦消しておく
-				AudioTrackVolumeData volumeData = AudioVolumeManager.GetOrCreateVolumeData(lfuState.timeline);
-
-				foreach (TrackAsset track in lfuState.timeline.GetOutputTracks())
+				foreach (LoweffortUploaderContext lfuCtx in lfuState.Uploaders)
 				{
-					if (track.muted) continue;
+					if (lfuCtx.lfUploader == null) return;
 
-					//Animation Handling
-					if (track is AnimationTrack)
+					LoweffortUploader lfUploader = lfuCtx?.lfUploader;
+					if (lfUploader == null) return;
+
+					if (lfuCtx.timeline == null) return;
+
+					PlayableDirector director = lfuCtx.director;
+					if (director == null) return;
+
+					Dictionary<string, GameObject> bindings = lfuCtx.bindings;
+					if (bindings == null) return;
+
+					AnimationClip mergedClip = new AnimationClip();
+					mergedClip.name = "mergedClip";
+					mergedClip.legacy = false;
+
+					List<(AnimationClip addAnim, GameObject addObject)> addClips = new List<(AnimationClip, GameObject)>();
+
+					//AudioVolumeManager.CleanUpVolumeData(lfuCtx.timeline);  //多分CleanUpがやりすぎるバグがあるので一旦消しておく
+					AudioTrackVolumeData volumeData = AudioVolumeManager.GetOrCreateVolumeData(lfuCtx.timeline);
+
+					foreach (TrackAsset track in lfuCtx.timeline.GetOutputTracks())
 					{
-						AnimationClip sumOfClip = (track as AnimationTrack).infiniteClip;
-						if (sumOfClip == null) sumOfClip = BakeAnimationTrackToMergedClip(track);
+						if (track.muted) continue;
 
-						addClips.Add((sumOfClip, bindings[track.name]));
-					}
-
-					//Audio Handling
-					else if (track is AudioTrack && obj.generateAudioObject)
-					{
-						List<TimelineClip> clips = track.GetClips().ToList();
-
-						foreach (TimelineClip nowClip in clips)
+						//Animation Handling
+						if (track is AnimationTrack)
 						{
-							AudioPlayableAsset audioPlayableAsset = nowClip?.asset as AudioPlayableAsset;
-							AudioClip audioClip = audioPlayableAsset?.clip;
+							AnimationClip sumOfClip = (track as AnimationTrack).infiniteClip;
+							if (sumOfClip == null) sumOfClip = BakeAnimationTrackToMergedClip(track);
 
-							if (audioClip == null)
+							addClips.Add((sumOfClip, bindings[track.name]));
+						}
+
+						//Audio Handling
+						else if (track is AudioTrack && lfUploader.generateAudioObject)
+						{
+							List<TimelineClip> clips = track.GetClips().ToList();
+
+							foreach (TimelineClip nowClip in clips)
 							{
-								LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} にオーディオクリップが存在しません。");
-								continue;
+								AudioPlayableAsset audioPlayableAsset = nowClip?.asset as AudioPlayableAsset;
+								AudioClip audioClip = audioPlayableAsset?.clip;
+
+								if (audioClip == null)
+								{
+									LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} にオーディオクリップが存在しません。");
+									continue;
+								}
+
+								if (audioClip.loadInBackground == false)
+								{
+									string audioClipPath = AssetDatabase.GetAssetPath(audioClip);
+									AudioImporter audioImporter = AssetImporter.GetAtPath(audioClipPath) as AudioImporter;
+									audioImporter.loadInBackground = true;
+									audioImporter.SaveAndReimport();
+								}
+
+								string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
+								string uniqueName = $"{audioClip.name}_{uniqueId}";
+								GameObject audioObject = new GameObject(uniqueName);
+								audioObject.transform.parent = lfUploader.transform;
+								audioObject.SetActive(false);
+
+								AudioSource audioSource = audioObject.AddComponent<AudioSource>();
+								audioSource.clip = audioClip;
+
+								//Volume Affect
+								if (lfuCtx.lfUploader.isAffectedAudioVolume)
+								{
+									string trackName = track.name;
+									string clipName = audioPlayableAsset.clip.name;
+									double startTime = nowClip.start;
+
+									AudioTrackVolumeEntity entity = volumeData.entities.Find(e => e.trackName == trackName && e.clipName == clipName && e.start == startTime);
+									float volume = entity != null ? entity.volume : 1.0f;
+
+									audioSource.volume = volume;
+								}
+
+								GenerateAndBindActivateCurve(mergedClip, nowClip, audioObject.name);
 							}
+						}
 
-							if (audioClip.loadInBackground == false)
+						//Activate Handling
+						else if (track is ActivationTrack)
+						{
+							List<TimelineClip> clips = track.GetClips().ToList();
+
+							GameObject activateObject = director.GetGenericBinding(track) as GameObject;
+							if (activateObject == null)
 							{
-								string audioClipPath = AssetDatabase.GetAssetPath(audioClip);
-								AudioImporter audioImporter = AssetImporter.GetAtPath(audioClipPath) as AudioImporter;
-								audioImporter.loadInBackground = true;
-								audioImporter.SaveAndReimport();
+								LogMessageSimplifier.PaLog(1, $"{track.name} にGameObjectが存在しません。");
 							}
 
 							string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
-							string uniqueName = $"{audioClip.name}_{uniqueId}";
-							GameObject audioObject = new GameObject(uniqueName);
-							audioObject.transform.parent = obj.transform;
-							audioObject.SetActive(false);
+							string uniqueName = $"{activateObject.name}_{uniqueId}";
+							activateObject.name = uniqueName;
 
-							AudioSource audioSource = audioObject.AddComponent<AudioSource>();
-							audioSource.clip = audioClip;
+							string activateObjectPath = GetGameObjectPath(activateObject);
+							string rootObjectPath = GetGameObjectPath(lfUploader.gameObject);
+							EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(GetRelativePath(activateObjectPath, rootObjectPath));
 
-							//Volume Affect
-							if (lfuState.lfUploader.isAffectedAudioVolume)
+							AnimationCurve curve = new AnimationCurve();
+
+							foreach (TimelineClip nowClip in clips)
 							{
-								string trackName = track.name;
-								string clipName = audioPlayableAsset.clip.name;
-								double startTime = nowClip.start;
-
-								AudioTrackVolumeEntity entity = volumeData.entities.Find(e => e.trackName == trackName && e.clipName == clipName && e.start == startTime);
-								float volume = entity != null ? entity.volume : 1.0f;
-
-								audioSource.volume = volume;
+								curve.AddKeySingleOnOff((float)nowClip.start, (float)nowClip.end);
 							}
 
-							GenerateAndBindActivateCurve(mergedClip, nowClip, audioObject.name);
-						}
-					}
-
-					//Activate Handling
-					else if (track is ActivationTrack)
-					{
-						List<TimelineClip> clips = track.GetClips().ToList();
-
-						GameObject activateObject = director.GetGenericBinding(track) as GameObject;
-						if (activateObject == null)
-						{
-							LogMessageSimplifier.PaLog(1, $"{track.name} にGameObjectが存在しません。");
+							AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
 						}
 
-						string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
-						string uniqueName = $"{activateObject.name}_{uniqueId}";
-						activateObject.name = uniqueName;
-
-						string activateObjectPath = GetGameObjectPath(activateObject);
-						string rootObjectPath = GetGameObjectPath(obj.gameObject);
-						EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(GetRelativePath(activateObjectPath, rootObjectPath));
-
-						AnimationCurve curve = new AnimationCurve();
-
-						foreach (TimelineClip nowClip in clips)
+						//Control Handling
+						else if (track is ControlTrack)
 						{
-							curve.AddKeySingleOnOff((float)nowClip.start, (float)nowClip.end);
-						}
+							List<TimelineClip> clips = track.GetClips().ToList();
 
-						AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
-					}
-
-					//Control Handling
-					else if (track is ControlTrack)
-					{
-						List<TimelineClip> clips = track.GetClips().ToList();
-
-						foreach (TimelineClip nowClip in clips)
-						{
-							ControlPlayableAsset controlPlayableAsset = nowClip?.asset as ControlPlayableAsset;
-							GameObject prefab = controlPlayableAsset.prefabGameObject;
-
-							if (prefab == null)
+							foreach (TimelineClip nowClip in clips)
 							{
-								LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} にPrefabが設定されていません。");
-								continue;
+								ControlPlayableAsset controlPlayableAsset = nowClip?.asset as ControlPlayableAsset;
+								GameObject prefab = controlPlayableAsset.prefabGameObject;
+
+								if (prefab == null)
+								{
+									LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} にPrefabが設定されていません。");
+									continue;
+								}
+
+								GameObject prefabObject = GameObject.Instantiate(prefab);
+								GameObject parentObject = controlPlayableAsset.sourceGameObject.Resolve(director);
+								prefabObject.transform.SetParent(parentObject == null ? director.gameObject.transform : parentObject.transform);
+
+								string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
+								prefabObject.name = $"{prefab.name}_{uniqueId}";
+								prefabObject.SetActive(false);
+
+								string prefabObjectPath = GetGameObjectPath(prefabObject);
+								string rootObjectPath = GetGameObjectPath(lfUploader.gameObject);
+								GenerateAndBindActivateCurve(mergedClip, nowClip, GetRelativePath(prefabObjectPath, rootObjectPath));
 							}
-
-							GameObject prefabObject = GameObject.Instantiate(prefab);
-							GameObject parentObject = controlPlayableAsset.sourceGameObject.Resolve(director);
-							prefabObject.transform.SetParent(parentObject == null ? director.gameObject.transform : parentObject.transform);
-
-							string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
-							prefabObject.name = $"{prefab.name}_{uniqueId}";
-							prefabObject.SetActive(false);
-
-							string prefabObjectPath = GetGameObjectPath(prefabObject);
-							string rootObjectPath = GetGameObjectPath(obj.gameObject);
-							GenerateAndBindActivateCurve(mergedClip, nowClip, GetRelativePath(prefabObjectPath, rootObjectPath));
 						}
 					}
-				}
 
-				addClips.Add((mergedClip, obj.gameObject));
+					addClips.Add((mergedClip, lfUploader.gameObject));
 
-				//Animator Setup
-				foreach (var addClip in addClips)
-				{
-					AnimationClip addAnimation = addClip.addAnim;
-					GameObject addGameObject = addClip.addObject;
-
-					Animator addAnimator = addGameObject?.GetComponent<Animator>();
-					if (addAnimator == null) addAnimator = addGameObject.AddComponent<Animator>();
-
-					AnimatorController addController = addAnimator?.runtimeAnimatorController as AnimatorController;
-					if (addController == null)
+					//Animator Setup
+					foreach (var addClip in addClips)
 					{
-						addController = new AnimatorController();
-						addAnimator.runtimeAnimatorController = addController;
+						AnimationClip addAnimation = addClip.addAnim;
+						GameObject addGameObject = addClip.addObject;
+
+						Animator addAnimator = addGameObject?.GetComponent<Animator>();
+						if (addAnimator == null) addAnimator = addGameObject.AddComponent<Animator>();
+
+						AnimatorController addController = addAnimator?.runtimeAnimatorController as AnimatorController;
+						if (addController == null)
+						{
+							addController = new AnimatorController();
+							addAnimator.runtimeAnimatorController = addController;
+						}
+
+						if (addAnimation != null) addController.AddLayer(SetupNewLayerAndState(addAnimation));
 					}
 
-					if (addAnimation != null) addController.AddLayer(SetupNewLayerAndState(addAnimation));
+					// GameObject inactivate
+					GameObject parent = director.gameObject.transform.parent.gameObject;
+					if (parent.name == "WorldFixed") parent.SetActive(false);
 				}
-
-				// GameObject inactivate
-				GameObject parent = director.gameObject.transform.parent.gameObject;
-				if (parent.name == "WorldFixed") parent.SetActive(false);
 			});
 
 			Sequence postProcess = InPhase(BuildPhase.Optimizing);
@@ -259,36 +271,40 @@ namespace PaLASOLU
 			postProcess.Run("PaLASOLU LfUploader Post Process", ctx =>
 			{
 				LoweffortUploaderState lfuState = ctx.GetState<LoweffortUploaderState>();
-				if (lfuState.lfUploader == null) return;
 
-				PlayableDirector director = lfuState.director;
-				if (director == null) return;
-
-				LoweffortUploader lfUploader = lfuState.lfUploader;
-
-				//PlayableDirector Delete
-
-				if (PrefabUtility.IsPartOfPrefabInstance(director))
+				foreach (LoweffortUploaderContext lfuCtx in lfuState.Uploaders)
 				{
-					PrefabUtility.RecordPrefabInstancePropertyModifications(director);
-					Object.DestroyImmediate(director, true);
-					LogMessageSimplifier.PaLog(0, "PlayableDirector を Prefab から削除しました。");
-				}
-				else
-				{
-					Object.DestroyImmediate(director);
-				}
+					if (lfuCtx.lfUploader == null) return;
 
-				//Delete LfUploader (for AAO Compatible)
-				if (PrefabUtility.IsPartOfPrefabInstance(lfUploader))
-				{
-					PrefabUtility.RecordPrefabInstancePropertyModifications(lfUploader);
-					Object.DestroyImmediate(lfUploader, true);
-					LogMessageSimplifier.PaLog(0, "PlayableDirector を Prefab から削除しました。");
-				}
-				else
-				{
-					Object.DestroyImmediate(lfUploader);
+					PlayableDirector director = lfuCtx.director;
+					if (director == null) return;
+
+					LoweffortUploader lfUploader = lfuCtx.lfUploader;
+					if (lfUploader == null) return;
+
+					//PlayableDirector Delete
+					if (PrefabUtility.IsPartOfPrefabInstance(director))
+					{
+						PrefabUtility.RecordPrefabInstancePropertyModifications(director);
+						Object.DestroyImmediate(director, true);
+						LogMessageSimplifier.PaLog(0, "PlayableDirector を Prefab から削除しました。");
+					}
+					else
+					{
+						Object.DestroyImmediate(director);
+					}
+
+					//Delete LfUploader (for AAO Compatible)
+					if (PrefabUtility.IsPartOfPrefabInstance(lfUploader))
+					{
+						PrefabUtility.RecordPrefabInstancePropertyModifications(lfUploader);
+						Object.DestroyImmediate(lfUploader, true);
+						LogMessageSimplifier.PaLog(0, "Low-effort Uploader を Prefab から削除しました。");
+					}
+					else
+					{
+						Object.DestroyImmediate(lfUploader);
+					}
 				}
 			});
 		}
