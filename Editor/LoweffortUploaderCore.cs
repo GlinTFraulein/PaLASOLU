@@ -26,7 +26,7 @@ namespace PaLASOLU
 		public Dictionary<string, GameObject> bindings;
 	}
 
-	public class LoweffortUploaderCore : Plugin<LoweffortUploaderCore>
+	public partial class LoweffortUploaderCore : Plugin<LoweffortUploaderCore>
 	{
 		protected override void Configure()
 		{
@@ -152,6 +152,8 @@ namespace PaLASOLU
 									audioImporter.loadInBackground = true;
 									audioImporter.SaveAndReimport();
 								}
+
+								if (nowClip.clipIn != 0.0) audioClip = CutClipbyTime(audioClip, nowClip.clipIn, nowClip.duration, lfuCtx.timeline);
 
 								string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
 								string uniqueName = $"{audioClip.name}_{uniqueId}";
