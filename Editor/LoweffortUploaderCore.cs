@@ -104,6 +104,9 @@ namespace PaLASOLU
 					PlayableDirector director = lfuCtx.director;
 					if (director == null) return;
 
+					TimelineAsset timeline = lfuCtx.timeline;
+					if (timeline == null) return;
+
 					Dictionary<string, GameObject> bindings = lfuCtx.bindings;
 					if (bindings == null) return;
 
@@ -145,6 +148,11 @@ namespace PaLASOLU
 									continue;
 								}
 
+								if (nowClip.clipIn != 0.0 || System.Math.Abs((nowClip.duration - audioClip.length)) > 0.01)
+									audioClip = CutClipbyTime(audioClip, nowClip.clipIn, nowClip.duration, timeline);
+
+								audioClip = FadeClip(audioClip, nowClip, timeline);
+
 								if (audioClip.loadInBackground == false)
 								{
 									string audioClipPath = AssetDatabase.GetAssetPath(audioClip);
@@ -153,10 +161,7 @@ namespace PaLASOLU
 									audioImporter.SaveAndReimport();
 								}
 
-								if (nowClip.clipIn != 0.0) audioClip = CutClipbyTime(audioClip, nowClip.clipIn, nowClip.duration, lfuCtx.timeline);
-
-								string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
-								string uniqueName = $"{audioClip.name}_{uniqueId}";
+								string uniqueName = SetUniqueName(audioClip.name);
 								GameObject audioObject = new GameObject(uniqueName);
 								audioObject.transform.parent = lfUploader.transform;
 								audioObject.SetActive(false);
@@ -192,8 +197,7 @@ namespace PaLASOLU
 								LogMessageSimplifier.PaLog(1, $"{track.name} にGameObjectが存在しません。");
 							}
 
-							string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
-							string uniqueName = $"{activateObject.name}_{uniqueId}";
+							string uniqueName = SetUniqueName(activateObject.name);
 							activateObject.name = uniqueName;
 
 							string activateObjectPath = GetGameObjectPath(activateObject);
@@ -230,8 +234,8 @@ namespace PaLASOLU
 								GameObject parentObject = controlPlayableAsset.sourceGameObject.Resolve(director);
 								prefabObject.transform.SetParent(parentObject == null ? director.gameObject.transform : parentObject.transform);
 
-								string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
-								prefabObject.name = $"{prefab.name}_{uniqueId}";
+								string uniqueName = SetUniqueName(prefab.name);
+								prefabObject.name = uniqueName;
 								prefabObject.SetActive(false);
 
 								string prefabObjectPath = GetGameObjectPath(prefabObject);
@@ -546,6 +550,14 @@ namespace PaLASOLU
 			}
 
 			return capsAllowLoop && assetAllowLoop;
+		}
+
+		public static string SetUniqueName(string name)
+		{
+			string uniqueId = System.Guid.NewGuid().ToString("N").Substring(0, 8);
+			string uniqueName = $"{name}_{uniqueId}";
+
+			return uniqueName;
 		}
 	}
 }
