@@ -5,7 +5,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
-using PaLASOLU;
 
 namespace PaLASOLU
 {
@@ -48,7 +47,7 @@ namespace PaLASOLU
 
 			float xOffset = (windowWidth - displayWidth) * 0.5f;
 			Rect bannerRect = new Rect(xOffset, GUILayoutUtility.GetRect(0, displayHeight).y, displayWidth, displayHeight);
-			
+
 			GUI.DrawTexture(bannerRect, banner, ScaleMode.ScaleToFit);
 
 			GUILayout.Space(8);
@@ -118,7 +117,6 @@ namespace PaLASOLU
 
 			AssetDatabase.Refresh();
 
-
 			//Setup Prefab Instance
 			GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(basePrefabPath);
 			GameObject plInstance = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
@@ -150,6 +148,8 @@ namespace PaLASOLU
 				}
 			}
 
+			//Prefab Variantとして保存するが、Scene上のPrefabは置換されない
+			PrefabUtility.SaveAsPrefabAssetAndConnect(plInstance, $"{savePath}/{plInstance.name}.prefab", InteractionMode.UserAction);
 			AudioVolumeManager.GetOrCreateVolumeData(timeline);
 
 			//Open Timeline window
@@ -188,7 +188,7 @@ namespace PaLASOLU
 			{
 				LogMessageSimplifier.PaLog(1, $"{path} フォルダは既に存在します。新しいフォルダは作られません。");
 				return false;
-				
+
 			}
 			else
 			{
