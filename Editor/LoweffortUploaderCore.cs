@@ -166,6 +166,7 @@ namespace PaLASOLU
 
 								AudioSource audioSource = audioObject.AddComponent<AudioSource>();
 								audioSource.clip = audioClip;
+								audioSource.loop = audioPlayableAsset.loop;
 
 								//Volume Affect
 								if (lfuCtx.lfUploader.isAffectedAudioVolume)
