@@ -148,10 +148,8 @@ namespace PaLASOLU
 									continue;
 								}
 
-								if (nowClip.clipIn != 0.0 || System.Math.Abs((nowClip.duration - audioClip.length)) > 0.01)
-									audioClip = CutClipbyTime(audioClip, nowClip.clipIn, nowClip.duration, timeline);
-
-								audioClip = FadeClip(audioClip, nowClip, timeline);
+								//Audio Modify - 何もしない場合はメソッド側でそのままaudioClipを返す
+								audioClip = ModifyClip(audioClip, nowClip, timeline);
 
 								if (audioClip.loadInBackground == false)
 								{
