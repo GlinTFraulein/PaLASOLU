@@ -7,7 +7,6 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 
 ### 追加
-- AudioTrackの途中再生に対応 (できるのか？) ← できそう
 - TimelineExtension
   - BPM基準でタイムラインを触れるようにする
   - GameObjectの名称変更にAnimationが追従するようにする
@@ -32,6 +31,20 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - (PaLASOLUの非推奨ではなく、PaLASOLUからPlayableDirectorへの"非推奨の要求"として、)Playable Track, Signal Track対応はVRC AvatarにScriptを含めることができないので、対応予定がありません
 
 ### 脆弱性
+
+## [1.2.0] - [2025-09-xx] - Welcome to UniMagic 6th Update!
+### 追加
+- Low-effort Uploaderに、AudioTrackの各種パラメータ対応を追加
+	- AudioClipの途中再生(Clip in)
+	- フェードイン/アウト(Blend in/out, Ease in/out)
+	- 再生速度変更(Speed Multiplier)
+	- ループ再生(AudioPlayableAsset Loop)
+
+### 変更
+- Setup OptimizationはBase Prefabからの派生Prefab Variantを生成するように変更
+
+### 修正
+- HelpのURLを最新版に修正
 
 ## [1.1.3] - [2025-09-16]
 ### 修正
