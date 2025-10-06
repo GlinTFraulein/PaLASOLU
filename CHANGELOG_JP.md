@@ -24,6 +24,8 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ### 修正
 - Low-effort Uploader : AnimationClipをLoopさせる場合に、良い感じの法線を設定する
 - Low-effort Uploader : AnimationClipがブレンドされる場合に対応する
+- Setup Optimizationをもっと使いやすく、シンプルにして現在のものを「Advance」に隔離する
+- Low-effort Uploaderの名前制限("ParticleLive"限定)を解除する
 
 ### 削除
 
@@ -32,7 +34,11 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 脆弱性
 
-## [1.2.0] - [2025-09-xx] - Welcome to UniMagic 6th Update!
+## [1.2.1] - [2025-10-06]
+### 修正
+- Activation Trackの対象がnoneだった場合にビルドできなかったバグを修正
+
+## [1.2.0] - [2025-09-29] - Welcome to UniMagic 6th Update!
 ### 追加
 - Low-effort Uploaderに、AudioTrackの各種パラメータ対応を追加
 	- AudioClipの途中再生(Clip in)
