@@ -194,6 +194,7 @@ namespace PaLASOLU
 							if (activateObject == null)
 							{
 								LogMessageSimplifier.PaLog(1, $"{track.name} にGameObjectが存在しません。");
+								continue;
 							}
 
 							string uniqueName = SetUniqueName(activateObject.name);
