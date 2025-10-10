@@ -11,12 +11,14 @@ namespace PaLASOLU
 	[HelpURL("https://glintfraulein.info/PaLASOLU/Document/SetupOptimization")]
 	public class ParticleLiveSetup : EditorWindow
 	{
-		const string basePrefabPath = "Packages/info.glintfraulein.palasolu/Runtime/Prefab/PaLASOLU_Prefab.prefab";
+		const string basePrefabPath = "Packages/info.glintfraulein.palasolu/Runtime/Prefab/PaLASOLU_v2_Prefab.prefab";
+		const string basePlayablePath = "Packages/info.glintfraulein.palasolu/Runtime/Prefab/PaLASOLU_v2_Playable.prefab";
 		const string bannerPath = "Packages/info.glintfraulein.palasolu//Image/PaLASOLU_Banner.png";
 
 		AudioClip particleLiveAudio = null;
 		string rootFolderName = string.Empty;
 		bool IsShowAdvancedSettings = false;
+		bool advancedSetup = false;
 		bool selectFolder = false;
 		bool moveAudioClip = false;
 		bool existTimeline = false;
@@ -71,6 +73,7 @@ namespace PaLASOLU
 			if (IsShowAdvancedSettings)
 			{
 				EditorGUI.indentLevel = 1;
+				advancedSetup = DrawResponsiveToggle("Advanced Setup (Avatar Menu, View Position, etc...)", advancedSetup);
 				selectFolder = DrawResponsiveToggle("Select Folder Directory", selectFolder);
 				moveAudioClip = DrawResponsiveToggle("Move AudioClip File to Particle Live Directory", moveAudioClip);
 				timelineLockNotice = DrawResponsiveToggle("Timeline Lock Notice", timelineLockNotice);
@@ -118,16 +121,29 @@ namespace PaLASOLU
 			AssetDatabase.Refresh();
 
 			//Setup Prefab Instance
-			GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(basePrefabPath);
-			GameObject plInstance = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
-			plInstance.name = rootFolderName + "_ParticleLive";
+			GameObject basePlayable = AssetDatabase.LoadAssetAtPath<GameObject>(basePlayablePath);
+			GameObject playableInstance = PrefabUtility.InstantiatePrefab(basePlayable) as GameObject;
+			playableInstance.name = rootFolderName + "_ParticleLive";
 
-			GameObject playableTarget = plInstance.transform.Find("WorldFixed/ParticleLive").gameObject;
+			LoweffortUploader lfUploader = playableInstance.GetComponent<LoweffortUploader>();
+
+			if (advancedSetup)
+			{
+				GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(basePrefabPath);
+				GameObject prefabInstance = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
+				prefabInstance.name = rootFolderName + "_Base";
+
+				playableInstance.transform.parent = prefabInstance.transform.Find("WorldFixed");
+			}
+			else
+			{
+				lfUploader.generateAvatarMenu = true;
+			}
+
 			TimelineAsset timeline = AssetDatabase.LoadAssetAtPath<TimelineAsset>(timelinePath);
-			PlayableDirector director = playableTarget.GetComponent<PlayableDirector>();
+			PlayableDirector director = playableInstance.GetComponent<PlayableDirector>();
 			director.playableAsset = timeline;
 
-			LoweffortUploader lfUploader = playableTarget.GetComponent<LoweffortUploader>();
 			lfUploader.director = director;
 			lfUploader.timeline = timeline;
 
@@ -135,7 +151,7 @@ namespace PaLASOLU
 			{
 				var animationTrack = timeline.CreateTrack<AnimationTrack>();
 				var audioTrack = timeline.CreateTrack<AudioTrack>();
-				director.SetGenericBinding(animationTrack, playableTarget.GetComponent<Animator>());
+				director.SetGenericBinding(animationTrack, playableInstance.GetComponent<Animator>());
 
 				if (particleLiveAudio != null)
 				{
@@ -149,7 +165,7 @@ namespace PaLASOLU
 			}
 
 			//Prefab Variantとして保存するが、Scene上のPrefabは置換されない
-			PrefabUtility.SaveAsPrefabAssetAndConnect(plInstance, $"{savePath}/{plInstance.name}.prefab", InteractionMode.UserAction);
+			PrefabUtility.SaveAsPrefabAssetAndConnect(playableInstance, $"{savePath}/{playableInstance.name}.prefab", InteractionMode.UserAction);
 			AudioVolumeManager.GetOrCreateVolumeData(timeline);
 
 			//Open Timeline window
