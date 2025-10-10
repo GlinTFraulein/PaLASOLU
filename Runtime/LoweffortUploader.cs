@@ -13,6 +13,7 @@ namespace PaLASOLU
 	{
 		public PlayableDirector director;
 		public TimelineAsset timeline;
+		public bool generateAvatarMenu = false;
 		public bool generateAudioObject = true;
 		public bool isAffectedAudioVolume = false;
 		const string bannerPath = "Packages/info.glintfraulein.palasolu//Image/PaLASOLU_Banner.png";
@@ -48,6 +49,7 @@ namespace PaLASOLU
 
 				if (advancedSettings = EditorGUILayout.Foldout(advancedSettings, "高度な設定"))
 				{
+					uploader.generateAvatarMenu = EditorGUILayout.Toggle("Generate Avatar Menu", uploader.generateAvatarMenu);
 					uploader.director = EditorGUILayout.ObjectField("PlayableDirector", uploader.director, typeof(PlayableDirector), true) as PlayableDirector;
 					uploader.generateAudioObject = EditorGUILayout.Toggle("Generate Audio object", uploader.generateAudioObject);
 					uploader.isAffectedAudioVolume = EditorGUILayout.Toggle("Affect AudioTrack Volume ", uploader.isAffectedAudioVolume);

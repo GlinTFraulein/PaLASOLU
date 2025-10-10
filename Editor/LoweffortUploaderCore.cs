@@ -68,6 +68,18 @@ namespace PaLASOLU
 					};
 
 					lfuState.Uploaders.Add(uploaderCtx);
+
+					if (lfUploader_finded.generateAvatarMenu)
+					{
+						GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ParticleLiveSetup.basePrefabPath);
+						GameObject prefabInstance = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
+						prefabInstance.name = lfUploader_finded.gameObject.name + "_Base";
+						prefabInstance.transform.parent = ctx.AvatarRootTransform;
+
+						lfUploader_finded.transform.parent = prefabInstance.transform.Find("WorldFixed");
+					}
+
+					lfUploader_finded.gameObject.name = "ParticleLive";
 				}
 
 				foreach (LoweffortUploaderContext lfuCtx in lfuState.Uploaders)

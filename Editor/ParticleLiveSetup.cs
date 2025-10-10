@@ -11,7 +11,7 @@ namespace PaLASOLU
 	[HelpURL("https://glintfraulein.info/PaLASOLU/Document/SetupOptimization")]
 	public class ParticleLiveSetup : EditorWindow
 	{
-		const string basePrefabPath = "Packages/info.glintfraulein.palasolu/Runtime/Prefab/PaLASOLU_v2_Prefab.prefab";
+		public const string basePrefabPath = "Packages/info.glintfraulein.palasolu/Runtime/Prefab/PaLASOLU_v2_Prefab.prefab";
 		const string basePlayablePath = "Packages/info.glintfraulein.palasolu/Runtime/Prefab/PaLASOLU_v2_Playable.prefab";
 		const string bannerPath = "Packages/info.glintfraulein.palasolu//Image/PaLASOLU_Banner.png";
 
