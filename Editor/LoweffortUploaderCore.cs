@@ -39,17 +39,19 @@ namespace PaLASOLU
 
 				foreach (LoweffortUploader lfUploader_finded in ctx?.AvatarRootObject.GetComponentsInChildren<LoweffortUploader>(true))
 				{
+					string lfUploader_ObjectName = lfUploader_finded.gameObject.name;
+
 					PlayableDirector director_finded = lfUploader_finded.director;
 					if (director_finded == null)
 					{
-						LogMessageSimplifier.PaLog(2, "PaLASOLU Low-effort Uploader に PlayableDirector コンポーネントが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PaLASOLU Low-eoofrt Uploader コンポーネント内の、「高度な設定」から Playable Director がNoneでないことを確認してください。");
+						LogMessageSimplifier.PaLog(2, $"{lfUploader_ObjectName} の PaLASOLU Low-effort Uploader に PlayableDirector コンポーネントが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、{lfUploader_ObjectName} GameObject の、 PaLASOLU Low-eoofrt Uploader コンポーネント内の、「高度な設定」から Playable Director がNoneでないことを確認してください。");
 						continue;
 					}
 
 					TimelineAsset timeline_finded = lfUploader_finded.timeline;
 					if (timeline_finded == null)
 					{
-						LogMessageSimplifier.PaLog(2, "PlayableDirector に Timeline Asset アセットが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、\"[楽曲名]_ParticleLive/WorldFixed/ParticleLive\" GameObject の、 PlayableDirector コンポーネント内の、 Playable が None でないことを確認してください。");
+						LogMessageSimplifier.PaLog(2, $"{lfUploader_ObjectName} の PlayableDirector に Timeline Asset アセットが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、{lfUploader_ObjectName} GameObject の、 PlayableDirector コンポーネント内の、 Playable が None でないことを確認してください。");
 						continue;
 					}
 
