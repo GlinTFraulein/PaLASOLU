@@ -26,6 +26,18 @@ namespace PaLASOLU
 		public Dictionary<string, GameObject> bindings;
 	}
 
+	internal class ProcessContext
+	{
+		public LoweffortUploaderContext lfuCtx;
+		public LoweffortUploader lfUploader;
+		public PlayableDirector director;
+		public TimelineAsset timeline;
+		public Dictionary<string, GameObject> bindings;
+		public List<(AnimationClip, GameObject)> addClips;
+		public AnimationClip mergedClip;
+		public AudioTrackVolumeData volumeData;
+	}
+
 	public partial class LoweffortUploaderCore : Plugin<LoweffortUploaderCore>
 	{
 		protected override void Configure()
@@ -134,142 +146,22 @@ namespace PaLASOLU
 					//AudioVolumeManager.CleanUpVolumeData(lfuCtx.timeline);  //多分CleanUpがやりすぎるバグがあるので一旦消しておく
 					AudioTrackVolumeData volumeData = AudioVolumeManager.GetOrCreateVolumeData(lfuCtx.timeline);
 
+					ProcessContext processCtx = new ProcessContext
+					{
+						lfuCtx = lfuCtx,
+						lfUploader = lfUploader,
+						director = director,
+						timeline = timeline,
+						bindings = bindings,
+						addClips = addClips,
+						mergedClip = mergedClip,
+						volumeData = volumeData
+					};
+
 					foreach (TrackAsset track in lfuCtx.timeline.GetOutputTracks())
 					{
-						if (track.muted) continue;
+						ProcessTrack(track, processCtx);
 
-						//Animation Handling
-						if (track is AnimationTrack)
-						{
-							AnimationClip sumOfClip = (track as AnimationTrack).infiniteClip;
-							if (sumOfClip == null) sumOfClip = BakeAnimationTrackToMergedClip(track);
-
-							addClips.Add((sumOfClip, bindings[track.name]));
-						}
-
-						//Audio Handling
-						else if (track is AudioTrack && lfUploader.generateAudioObject)
-						{
-							List<TimelineClip> clips = track.GetClips().ToList();
-
-							foreach (TimelineClip nowClip in clips)
-							{
-								AudioPlayableAsset audioPlayableAsset = nowClip?.asset as AudioPlayableAsset;
-								AudioClip audioClip = audioPlayableAsset?.clip;
-
-								if (audioClip == null)
-								{
-									LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} にオーディオクリップが存在しません。");
-									continue;
-								}
-
-								//Audio Modify - 何もしない場合はメソッド側でそのままaudioClipを返す
-								audioClip = ModifyClip(audioClip, nowClip, timeline);
-
-								if (audioClip.loadInBackground == false)
-								{
-									string audioClipPath = AssetDatabase.GetAssetPath(audioClip);
-									AudioImporter audioImporter = AssetImporter.GetAtPath(audioClipPath) as AudioImporter;
-									audioImporter.loadInBackground = true;
-									audioImporter.SaveAndReimport();
-								}
-
-								string uniqueName = SetUniqueName(audioClip.name);
-								GameObject audioObject = new GameObject(uniqueName);
-								audioObject.transform.parent = lfUploader.transform;
-								audioObject.SetActive(false);
-
-								AudioSource audioSource = audioObject.AddComponent<AudioSource>();
-								audioSource.clip = audioClip;
-								audioSource.loop = audioPlayableAsset.loop;
-
-								//Volume Affect
-								if (lfuCtx.lfUploader.isAffectedAudioVolume)
-								{
-									string trackName = track.name;
-									string clipName = audioPlayableAsset.clip.name;
-									double startTime = nowClip.start;
-
-									AudioTrackVolumeEntity entity = volumeData.entities.Find(e => e.trackName == trackName && e.clipName == clipName && e.start == startTime);
-									float volume = entity != null ? entity.volume : 1.0f;
-
-									audioSource.volume = volume;
-								}
-
-								GenerateAndBindActivateCurve(mergedClip, nowClip, audioObject.name);
-							}
-						}
-
-						//Activate Handling
-						else if (track is ActivationTrack)
-						{
-							List<TimelineClip> clips = track.GetClips().ToList();
-
-							GameObject activateObject = director.GetGenericBinding(track) as GameObject;
-							if (activateObject == null)
-							{
-								LogMessageSimplifier.PaLog(1, $"{track.name} にGameObjectが存在しません。");
-								continue;
-							}
-
-							string uniqueName = SetUniqueName(activateObject.name);
-							activateObject.name = uniqueName;
-
-							string activateObjectPath = GetGameObjectPath(activateObject);
-							string rootObjectPath = GetGameObjectPath(lfUploader.gameObject);
-							EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(GetRelativePath(activateObjectPath, rootObjectPath));
-
-							AnimationCurve curve = new AnimationCurve();
-
-							foreach (TimelineClip nowClip in clips)
-							{
-								curve.AddKeySingleOnOff((float)nowClip.start, (float)nowClip.end);
-							}
-
-							AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
-						}
-
-						//Control Handling
-						else if (track is ControlTrack)
-						{
-							List<TimelineClip> clips = track.GetClips().ToList();
-
-							foreach (TimelineClip nowClip in clips)
-							{
-								ControlPlayableAsset controlPlayableAsset = nowClip?.asset as ControlPlayableAsset;
-								GameObject prefab = controlPlayableAsset.prefabGameObject;
-
-								GameObject prefabObject;
-
-								if (prefab != null)
-								{
-									prefabObject = GameObject.Instantiate(prefab);
-									GameObject parentObject = controlPlayableAsset.sourceGameObject.Resolve(director);
-									prefabObject.transform.SetParent(parentObject == null ? director.gameObject.transform : parentObject.transform);
-
-									GameObject transformObject = controlPlayableAsset.sourceGameObject.Resolve(director);
-									if (transformObject != null)
-									{
-										prefabObject.transform.SetParent(transformObject.transform);
-										prefabObject.transform.localPosition = Vector3.zero;
-										prefabObject.transform.localRotation = Quaternion.identity;
-										prefabObject.transform.localScale = Vector3.one;
-									}
-								}
-								else
-								{
-									prefabObject = controlPlayableAsset.sourceGameObject.Resolve(director);
-								}
-
-								string uniqueName = SetUniqueName(prefabObject.name);
-								prefabObject.name = uniqueName;
-								prefabObject.SetActive(false);
-
-								string prefabObjectPath = GetGameObjectPath(prefabObject);
-								string rootObjectPath = GetGameObjectPath(lfUploader.gameObject);
-								GenerateAndBindActivateCurve(mergedClip, nowClip, GetRelativePath(prefabObjectPath, rootObjectPath));
-							}
-						}
 					}
 
 					addClips.Add((mergedClip, lfUploader.gameObject));
@@ -340,6 +232,154 @@ namespace PaLASOLU
 					}
 				}
 			});
+		}
+
+		void ProcessTrack(TrackAsset track, ProcessContext processCtx)
+		{
+			//Track Group Handling
+			foreach (TrackAsset child in track.GetChildTracks())
+			{
+				ProcessTrack(child, processCtx);
+			}
+
+			if (track.muted) return;
+
+			LoweffortUploader lfUploader = processCtx.lfUploader;
+			AnimationClip mergedClip = processCtx.mergedClip;
+
+			//Animation Handling
+			if (track is AnimationTrack)
+			{
+				AnimationClip sumOfClip = (track as AnimationTrack).infiniteClip;
+				if (sumOfClip == null) sumOfClip = BakeAnimationTrackToMergedClip(track);
+
+				processCtx.addClips.Add((sumOfClip, processCtx.bindings[track.name]));
+			}
+
+			//Audio Handling
+			else if (track is AudioTrack && lfUploader.generateAudioObject)
+			{
+				List<TimelineClip> clips = track.GetClips().ToList();
+
+				foreach (TimelineClip nowClip in clips)
+				{
+					AudioPlayableAsset audioPlayableAsset = nowClip?.asset as AudioPlayableAsset;
+					AudioClip audioClip = audioPlayableAsset?.clip;
+
+					if (audioClip == null)
+					{
+						LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} にオーディオクリップが存在しません。");
+						continue;
+					}
+
+					//Audio Modify - 何もしない場合はメソッド側でそのままaudioClipを返す
+					audioClip = ModifyClip(audioClip, nowClip, processCtx.timeline);
+
+					if (audioClip.loadInBackground == false)
+					{
+						string audioClipPath = AssetDatabase.GetAssetPath(audioClip);
+						AudioImporter audioImporter = AssetImporter.GetAtPath(audioClipPath) as AudioImporter;
+						audioImporter.loadInBackground = true;
+						audioImporter.SaveAndReimport();
+					}
+
+					string uniqueName = SetUniqueName(audioClip.name);
+					GameObject audioObject = new GameObject(uniqueName);
+					audioObject.transform.parent = lfUploader.transform;
+					audioObject.SetActive(false);
+
+					AudioSource audioSource = audioObject.AddComponent<AudioSource>();
+					audioSource.clip = audioClip;
+					audioSource.loop = audioPlayableAsset.loop;
+
+					//Volume Affect
+					if (processCtx.lfuCtx.lfUploader.isAffectedAudioVolume)
+					{
+						string trackName = track.name;
+						string clipName = audioPlayableAsset.clip.name;
+						double startTime = nowClip.start;
+
+						AudioTrackVolumeEntity entity = processCtx.volumeData.entities.Find(e => e.trackName == trackName && e.clipName == clipName && e.start == startTime);
+						float volume = entity != null ? entity.volume : 1.0f;
+
+						audioSource.volume = volume;
+					}
+
+					GenerateAndBindActivateCurve(mergedClip, nowClip, audioObject.name);
+				}
+			}
+
+			//Activate Handling
+			else if (track is ActivationTrack)
+			{
+				List<TimelineClip> clips = track.GetClips().ToList();
+
+				GameObject activateObject = processCtx.director.GetGenericBinding(track) as GameObject;
+				if (activateObject == null)
+				{
+					LogMessageSimplifier.PaLog(1, $"{track.name} にGameObjectが存在しません。");
+					return;
+				}
+
+				string uniqueName = SetUniqueName(activateObject.name);
+				activateObject.name = uniqueName;
+
+				string activateObjectPath = GetGameObjectPath(activateObject);
+				string rootObjectPath = GetGameObjectPath(lfUploader.gameObject);
+				EditorCurveBinding binding = AnimationEditExtension.CreateIsActiveBinding(GetRelativePath(activateObjectPath, rootObjectPath));
+
+				AnimationCurve curve = new AnimationCurve();
+
+				foreach (TimelineClip nowClip in clips)
+				{
+					curve.AddKeySingleOnOff((float)nowClip.start, (float)nowClip.end);
+				}
+
+				AnimationUtility.SetEditorCurve(mergedClip, binding, curve);
+			}
+
+			//Control Handling
+			else if (track is ControlTrack)
+			{
+				List<TimelineClip> clips = track.GetClips().ToList();
+
+				foreach (TimelineClip nowClip in clips)
+				{
+					ControlPlayableAsset controlPlayableAsset = nowClip?.asset as ControlPlayableAsset;
+					GameObject prefab = controlPlayableAsset.prefabGameObject;
+
+					GameObject prefabObject;
+					PlayableDirector director = processCtx.director;
+
+					if (prefab != null)
+					{
+						prefabObject = GameObject.Instantiate(prefab);
+						GameObject parentObject = controlPlayableAsset.sourceGameObject.Resolve(director);
+						prefabObject.transform.SetParent(parentObject == null ? director.gameObject.transform : parentObject.transform);
+
+						GameObject transformObject = controlPlayableAsset.sourceGameObject.Resolve(director);
+						if (transformObject != null)
+						{
+							prefabObject.transform.SetParent(transformObject.transform);
+							prefabObject.transform.localPosition = Vector3.zero;
+							prefabObject.transform.localRotation = Quaternion.identity;
+							prefabObject.transform.localScale = Vector3.one;
+						}
+					}
+					else
+					{
+						prefabObject = controlPlayableAsset.sourceGameObject.Resolve(director);
+					}
+
+					string uniqueName = SetUniqueName(prefabObject.name);
+					prefabObject.name = uniqueName;
+					prefabObject.SetActive(false);
+
+					string prefabObjectPath = GetGameObjectPath(prefabObject);
+					string rootObjectPath = GetGameObjectPath(lfUploader.gameObject);
+					GenerateAndBindActivateCurve(mergedClip, nowClip, GetRelativePath(prefabObjectPath, rootObjectPath));
+				}
+			}
 		}
 
 		private static string GetRelativePath(string fullPath, string rootPath)
@@ -473,7 +513,7 @@ namespace PaLASOLU
 						/*
 						 * TODO : Tangent補完
 						float tangent = 0;
-						
+
 						if (curve.length >= 2)
 						{
 							for (int i = 0; i < curve.length - 1; i++)
