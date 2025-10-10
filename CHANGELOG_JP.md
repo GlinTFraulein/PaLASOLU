@@ -24,8 +24,6 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ### 修正
 - Low-effort Uploader : AnimationClipをLoopさせる場合に、良い感じの法線を設定する
 - Low-effort Uploader : AnimationClipがブレンドされる場合に対応する
-- Setup Optimizationをもっと使いやすく、シンプルにして現在のものを「Advance」に隔離する
-- Low-effort Uploaderの名前制限("ParticleLive"限定)を解除する
 
 ### 削除
 
@@ -33,6 +31,30 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - (PaLASOLUの非推奨ではなく、PaLASOLUからPlayableDirectorへの"非推奨の要求"として、)Playable Track, Signal Track対応はVRC AvatarにScriptを含めることができないので、対応予定がありません
 
 ### 脆弱性
+
+## [2.0.0] - [2025-10-10] - 4th month Anniversary! (from first publish)
+### 重大
+- Setup Optimizationで生成されるPrefabに変更が入っています。**1.2.1以前で生成されるPrefabとはまったくの別物であり、互換性がありません！**
+	- 影響があるのはセットアップ時のみなので、ほとんどの場合は気にしなくても大丈夫です。
+- 旧バージョンのPrefabにも変更が入っています。こちらはおそらく互換性は保ったままの変更ではありますが、動作に変更が加わっています。必要に応じてバックアップを取ってから更新をしてください。
+
+### 追加
+- Extensions/BPM to Second & Frame Calculatorを追加 (暫定)
+- Control TrackのSource Game Object, Parent Object対応を追加
+- Track Group対応を追加
+- エラー文にバージョン記載を追加
+
+### 変更
+- Setup Optimizationで生成されるPrefabを全面的に変更
+	- デフォルト状態ではPlayableDirector、PaLASOLU Low-effort Uploaderのみがついた単一Prefabを生成するように
+	- 旧バージョンのようにワールド固定やメニューをHierarchy上に出したい(=カスタムしたい)場合は、高度な設定=>Advanced Setup のチェックを入れると旧バージョンに近い形態のPrefabが展開されます。
+	- アバターを視界に入れていなくてもワールド固定、ライブ再生が正しく動くように
+- Fix rotation for "Create Particle System"はデフォルトでOFFに
+- Low-effort UploaderはGameObject名が"ParticleLive"以外でも正しく動くように
+
+### 修正
+- "LocalOnly"GameObject("IsLocal"パラメーター)が想定通り動いていなかった問題を修正
+- SampleのQRコードが正しくなかったのを修正
 
 ## [1.2.1] - [2025-10-06]
 ### 修正

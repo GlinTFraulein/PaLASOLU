@@ -16,7 +16,7 @@ Playable Directorをつけたままでもパーティクルライブ付アバタ
 今のところないので、あったら教えてください！
 
 (自分向け 更新手順)
-1. package.jsonのバージョン番号を変更（例：1.0.0→1.1.0）
+1. package.json, LogMessageSimplifierのバージョン番号を変更（例：1.0.0→1.1.0）
 2. CHANGELOG.mdを書く
 3. GitHub Actionsでリリースを行う
 4. ドラフトからリリースを生やす ここでタグも付ける
