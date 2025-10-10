@@ -10,7 +10,7 @@ namespace PaLASOLU
 {
 	public class AudioTrackVolumeData : ScriptableObject
 	{
-		public List<AudioTrackVolumeEntity> entities = new(); 
+		public List<AudioTrackVolumeEntity> entities = new();
 	}
 
 	[System.Serializable]
@@ -32,7 +32,7 @@ namespace PaLASOLU
 			EditorGUI.BeginChangeCheck();
 
 			base.OnInspectorGUI();
-			
+
 			if (EditorGUI.EndChangeCheck())
 			{
 				AudioPlayableAsset asset = (AudioPlayableAsset)target;
@@ -58,8 +58,8 @@ namespace PaLASOLU
 
 				AudioTrackVolumeData volumeData = GetOrCreateVolumeData(timeline);
 
-				
-				var entity = volumeData.entities.Find(e => 
+
+				var entity = volumeData.entities.Find(e =>
 					e.trackName == trackName &&
 					e.clipName == clipName &&
 					Math.Abs(e.start - startTime) < 0.001
@@ -117,7 +117,7 @@ namespace PaLASOLU
 			if (TryFindClipAndTrack(asset, out TrackAsset track, out _)) return track;
 			else return null;
 		}
-		
+
 		TimelineClip FindClipManually(AudioPlayableAsset asset)
 		{
 			if (TryFindClipAndTrack(asset, out _, out TimelineClip clip)) return clip;
