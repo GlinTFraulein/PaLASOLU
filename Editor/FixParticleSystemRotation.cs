@@ -10,7 +10,7 @@ namespace PaLASOLU
 	public class FixParticleSystemRotation
 	{
 		private static HashSet<int> previousInstanceIDs;
-		private static bool fixRotate = true;
+		private static bool fixRotate = false;
 		private static bool isQueued;
 		private const string menuPath = "Tools/PaLASOLU/Extensions/Fix rotation for \"Create Particle System\"";
 
