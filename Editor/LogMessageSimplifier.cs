@@ -4,9 +4,10 @@ namespace PaLASOLU
 {
 	public class LogMessageSimplifier
 	{
+		const string version = "1.3.0";
 		public static void PaLog(int num, string message)
 		{
-			string returnMessage = "[PaLASOLU] ";
+			string returnMessage = $"[PaLASOLU {version}]";
 			if (num == 0) returnMessage += "ログ(正常) : ";
 			else if (num == 1) returnMessage += "警告 : ";
 			else if (num == 2) returnMessage += "エラー : ";
