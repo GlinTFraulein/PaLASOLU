@@ -75,6 +75,7 @@ namespace PaLASOLU
 					{
 						GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ParticleLiveSetup.basePrefabPath);
 						GameObject prefabInstance = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
+						PrefabUtility.UnpackPrefabInstance(prefabInstance, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
 						prefabInstance.name = lfUploader_finded.gameObject.name + "_Base";
 						prefabInstance.transform.parent = ctx.AvatarRootTransform;
 
@@ -238,17 +239,29 @@ namespace PaLASOLU
 								ControlPlayableAsset controlPlayableAsset = nowClip?.asset as ControlPlayableAsset;
 								GameObject prefab = controlPlayableAsset.prefabGameObject;
 
-								if (prefab == null)
+								GameObject prefabObject;
+
+								if (prefab != null)
 								{
-									LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} にPrefabが設定されていません。");
-									continue;
+									prefabObject = GameObject.Instantiate(prefab);
+									GameObject parentObject = controlPlayableAsset.sourceGameObject.Resolve(director);
+									prefabObject.transform.SetParent(parentObject == null ? director.gameObject.transform : parentObject.transform);
+
+									GameObject transformObject = controlPlayableAsset.sourceGameObject.Resolve(director);
+									if (transformObject != null)
+									{
+										prefabObject.transform.SetParent(transformObject.transform);
+										prefabObject.transform.localPosition = Vector3.zero;
+										prefabObject.transform.localRotation = Quaternion.identity;
+										prefabObject.transform.localScale = Vector3.one;
+									}
+								}
+								else
+								{
+									prefabObject = controlPlayableAsset.sourceGameObject.Resolve(director);
 								}
 
-								GameObject prefabObject = GameObject.Instantiate(prefab);
-								GameObject parentObject = controlPlayableAsset.sourceGameObject.Resolve(director);
-								prefabObject.transform.SetParent(parentObject == null ? director.gameObject.transform : parentObject.transform);
-
-								string uniqueName = SetUniqueName(prefab.name);
+								string uniqueName = SetUniqueName(prefabObject.name);
 								prefabObject.name = uniqueName;
 								prefabObject.SetActive(false);
 
