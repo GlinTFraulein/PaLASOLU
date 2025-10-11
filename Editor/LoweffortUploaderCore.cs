@@ -109,7 +109,7 @@ namespace PaLASOLU
 							continue;
 						}
 						//animatorObjectは紐付けられているGameObjectを取る(AnimatorはNDMFで一度削除されるため)
-						else lfuCtx.bindings[track.name] = animator.gameObject;
+						lfuCtx.bindings.Add(track.name, animator.gameObject);
 					}
 				}
 			});
@@ -252,8 +252,13 @@ namespace PaLASOLU
 			{
 				AnimationClip sumOfClip = (track as AnimationTrack).infiniteClip;
 				if (sumOfClip == null) sumOfClip = BakeAnimationTrackToMergedClip(track);
+				if (!processCtx.bindings.TryGetValue(track.name, out var clip) || clip == null)
+				{
+					LogMessageSimplifier.PaLog(1, $"{track.name} トラックに紐づく GameObject が見つかりません。");
+					return;
+				}
 
-				processCtx.addClips.Add((sumOfClip, processCtx.bindings[track.name]));
+				processCtx.addClips.Add((sumOfClip, clip));
 			}
 
 			//Audio Handling
