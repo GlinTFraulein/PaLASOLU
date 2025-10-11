@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using nadena.dev.ndmf;
+﻿using nadena.dev.ndmf;
 using nadena.dev.ndmf.fluent;
 using PaLASOLU;
 using System.Collections.Generic;
