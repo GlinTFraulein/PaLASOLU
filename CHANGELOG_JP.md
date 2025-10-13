@@ -17,6 +17,7 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - Infinite Clip Baker
 - Avatar Root Motion(Action Layer / not-VRChatAvatar Animator)
 - Particle Curve Inverter - ParticleCurveを上下/左右反転させる機能
+- Simulate Layer = Everythingにする
 
 ### 変更
 - AudioClip.Create()を用いて、元のAudioClipのLoadInBackgroundを変更しないようにする
@@ -27,10 +28,17 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 削除
 
+### 調査
+- VRCQuestToolsとの互換性 or アラートを出す
+
 ### 非推奨
 - (PaLASOLUの非推奨ではなく、PaLASOLUからPlayableDirectorへの"非推奨の要求"として、)Playable Track, Signal Track対応はVRC AvatarにScriptを含めることができないので、対応予定がありません
 
 ### 脆弱性
+
+## [2.0.1] - [2025-10-13]
+### 修正
+- [#5] Animatorが設定されていないTrackが存在する場合にエラーになる不具合を修正
 
 ## [2.0.0] - [2025-10-10] - 4th month Anniversary! (from first publish)
 ### 重大
