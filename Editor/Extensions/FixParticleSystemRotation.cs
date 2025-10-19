@@ -37,7 +37,7 @@ namespace PaLASOLU
 			EditorApplication.delayCall -= Load;
 		}
 
-		[MenuItem(menuPath, priority = 210)]
+		[MenuItem(menuPath, priority = 350)]
 		private static void FixRotationParticleSystem()
 		{
 			fixRotate = !fixRotate;

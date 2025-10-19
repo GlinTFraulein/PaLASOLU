@@ -13,7 +13,7 @@ namespace PaLASOLU
 		double oldspb;
 		double oldfpb;
 
-		[MenuItem("Tools/PaLASOLU/Extensions/BPM to Second & Frame Calculator", priority = 201)]
+		[MenuItem("Tools/PaLASOLU/Extensions/BPM to Second & Frame Calculator", priority = 301)]
 		static void Init()
 		{
 			var window = GetWindow<BPMtoSecondAndFrameCalculator>("BPM to Second & Frame Calculator");
