@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -16,6 +17,9 @@ namespace PaLASOLU
 		public bool generateAvatarMenu = false;
 		public bool generateAudioObject = true;
 		public bool isAffectedAudioVolume = false;
+
+		//private Dictionary<int, double> audioVolume;	将来的にやる
+
 		const string bannerPath = "Packages/info.glintfraulein.palasolu//Image/PaLASOLU_Banner.png";
 		static Texture banner = null;
 
