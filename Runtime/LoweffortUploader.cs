@@ -16,7 +16,7 @@ namespace PaLASOLU
 		public TimelineAsset timeline;
 		public bool generateAvatarMenu = false;
 		public bool generateAudioObject = true;
-		public bool isAffectedAudioVolume = false;
+		public bool isAffectedAudioVolume = true;
 
 		//private Dictionary<int, double> audioVolume;	将来的にやる
 
