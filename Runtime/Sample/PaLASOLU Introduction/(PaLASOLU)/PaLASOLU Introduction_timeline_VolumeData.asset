@@ -9,15 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 42dd068c85b51c646a32da818783c969, type: 3}
   m_Name: PaLASOLU Introduction_timeline_VolumeData
-  m_EditorClassIdentifier: info.glintfraulein.palasolu.editor:PaLASOLU:AudioTrackVolumeData
+  m_EditorClassIdentifier: 
   entities:
-  - trackName: Audio Track
-    clipName: PaLASOLU
-    start: 0
+  - instanceID: 31104
     volume: 0.5
-  - trackName: Audio Track (1)
-    clipName: PaLASOLU_senden_voice
-    start: 0
-    volume: 1
