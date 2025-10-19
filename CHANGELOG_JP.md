@@ -17,7 +17,7 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - Infinite Clip Baker
 - Avatar Root Motion(Action Layer / not-VRChatAvatar Animator)
 - Particle Curve Inverter - ParticleCurveを上下/左右反転させる機能
-- Simulate Layer = Everythingにする
+- Simulate Layer = Everythingにする ← 全ての試みが、失敗……
 
 ### 変更
 - AudioClip.Create()を用いて、元のAudioClipのLoadInBackgroundを変更しないようにする
@@ -35,6 +35,19 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - (PaLASOLUの非推奨ではなく、PaLASOLUからPlayableDirectorへの"非推奨の要求"として、)Playable Track, Signal Track対応はVRC AvatarにScriptを含めることができないので、対応予定がありません
 
 ### 脆弱性
+
+## [2.1.0] - [2025-10-19] - UniMagic 6th (Department of Particle Live) Graduation Commemoration Update!
+### 追加
+- Extensions/Img2Mat, Extensions/Mat2Variant を追加 by [anatawa12](https://github.com/anatawa12)
+
+### 変更
+- Extensions内のツール順を変更
+- Affect AudioTrack Volumeのデフォルト値をTrueに変更
+	- AudioTrackのTimeline Clipの諸動作が正しく反映されるようになったので、当然Audio Playable Assetの動作も反映されてほしいはずです。
+
+### 修正
+- Affect AudioTrack Volume オプションが正しく動いていなかった問題を修正
+- Sample Prefabをv2系統のPrefabに更新
 
 ## [2.0.1] - [2025-10-13]
 ### 修正
