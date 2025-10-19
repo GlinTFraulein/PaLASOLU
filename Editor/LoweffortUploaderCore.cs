@@ -143,7 +143,7 @@ namespace PaLASOLU
 
 					List<(AnimationClip addAnim, GameObject addObject)> addClips = new List<(AnimationClip, GameObject)>();
 
-					//AudioVolumeManager.CleanUpVolumeData(lfuCtx.timeline);  //多分CleanUpがやりすぎるバグがあるので一旦消しておく
+					AudioVolumeManager.CleanUpVolumeData(lfuCtx.timeline);
 					AudioTrackVolumeData volumeData = AudioVolumeManager.GetOrCreateVolumeData(lfuCtx.timeline);
 
 					ProcessContext processCtx = new ProcessContext
@@ -300,11 +300,9 @@ namespace PaLASOLU
 					//Volume Affect
 					if (processCtx.lfuCtx.lfUploader.isAffectedAudioVolume)
 					{
-						string trackName = track.name;
-						string clipName = audioPlayableAsset.clip.name;
-						double startTime = nowClip.start;
+						int instanceID = audioPlayableAsset.GetInstanceID();
 
-						AudioTrackVolumeEntity entity = processCtx.volumeData.entities.Find(e => e.trackName == trackName && e.clipName == clipName && e.start == startTime);
+						AudioTrackVolumeEntity entity = processCtx.volumeData.entities.Find(e => e.instanceID == instanceID);
 						float volume = entity != null ? entity.volume : 1.0f;
 
 						audioSource.volume = volume;

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -8,20 +7,6 @@ using UnityEngine.Timeline;
 
 namespace PaLASOLU
 {
-	public class AudioTrackVolumeData : ScriptableObject
-	{
-		public List<AudioTrackVolumeEntity> entities = new();
-	}
-
-	[System.Serializable]
-	public class AudioTrackVolumeEntity
-	{
-		public string trackName;
-		public string clipName;
-		public double start;
-		public float volume;
-	}
-
 	[CustomEditor(typeof(AudioPlayableAsset))]
 	public class AudioVolumeManager : Editor
 	{
@@ -39,8 +24,9 @@ namespace PaLASOLU
 				TimelineAsset timeline = GetTimelineAsset(asset);
 				TrackAsset track = FindParentTrack(asset);
 
-				string trackName = track.name;
-				string clipName = asset.clip.name;
+				int instanceID = asset.GetInstanceID();
+
+				LogMessageSimplifier.PaLog(3, $"instanceID : {instanceID}");
 
 				//start time
 				TimelineClip clip = FindClipManually(asset);
@@ -59,18 +45,12 @@ namespace PaLASOLU
 				AudioTrackVolumeData volumeData = GetOrCreateVolumeData(timeline);
 
 
-				var entity = volumeData.entities.Find(e =>
-					e.trackName == trackName &&
-					e.clipName == clipName &&
-					Math.Abs(e.start - startTime) < 0.001
-				);
+				var entity = volumeData.entities.Find(e => e.instanceID == instanceID);
 				if (entity == null)
 				{
 					entity = new AudioTrackVolumeEntity
 					{
-						trackName = trackName,
-						clipName = clipName,
-						start = startTime,
+						instanceID = instanceID,
 						volume = volumeValue
 					};
 					volumeData.entities.Add(entity);
@@ -151,17 +131,21 @@ namespace PaLASOLU
 		public static void CleanUpVolumeData(TimelineAsset timeline)
 		{
 			AudioTrackVolumeData volumeData = GetOrCreateVolumeData(timeline);
-			var validKeys = new HashSet<(string track, string clip, double start)>();
+			var validKeys = new HashSet<int>();
 
 			foreach (var track in timeline.GetOutputTracks())
 			{
-				foreach (var clip in track.GetClips())
+				if (track is AudioTrack)
 				{
-					validKeys.Add((track.name, clip.displayName, clip.start));
+					foreach (var clip in track.GetClips().ToList())
+					{
+						AudioPlayableAsset asset = clip?.asset as AudioPlayableAsset;
+						validKeys.Add(asset.GetInstanceID());
+					}
 				}
 			}
 
-			volumeData.entities.RemoveAll(e => !validKeys.Contains((e.trackName, e.clipName, e.start)));
+			volumeData.entities.RemoveAll(e => !validKeys.Contains((e.instanceID)));
 		}
 	}
 }
