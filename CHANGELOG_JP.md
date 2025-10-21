@@ -36,6 +36,10 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 脆弱性
 
+## [2.1.1] - [2025-10-21]
+### 修正
+- 不要なInternalLogが出ないように修正
+
 ## [2.1.0] - [2025-10-19] - UniMagic 6th (Department of Particle Live) Graduation Commemoration Update!
 ### 追加
 - Extensions/Img2Mat, Extensions/Mat2Variant を追加 by [anatawa12](https://github.com/anatawa12)

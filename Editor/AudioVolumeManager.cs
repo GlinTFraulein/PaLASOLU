@@ -26,8 +26,6 @@ namespace PaLASOLU
 
 				int instanceID = asset.GetInstanceID();
 
-				LogMessageSimplifier.PaLog(3, $"instanceID : {instanceID}");
-
 				//start time
 				TimelineClip clip = FindClipManually(asset);
 				double startTime = clip.start;
