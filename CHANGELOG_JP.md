@@ -25,6 +25,8 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ### 修正
 - Low-effort Uploader : AnimationClipをLoopさせる場合に、良い感じの法線を設定する
 - Low-effort Uploader : AnimationClipがブレンドされる場合に対応する
+- Low-effort Uploader : Playable Directorが別のGameObjectについている場合、Generate Avatar Menuが正しく動作しない
+- Low-effort Uploader : 一部の環境で無駄に重いのを修正する
 
 ### 削除
 
@@ -35,6 +37,11 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 - (PaLASOLUの非推奨ではなく、PaLASOLUからPlayableDirectorへの"非推奨の要求"として、)Playable Track, Signal Track対応はVRC AvatarにScriptを含めることができないので、対応予定がありません
 
 ### 脆弱性
+
+## [2.2.0] - [2025-10-28]
+### 追加
+- Tools/PaLASOLU/Extensions/PaLASOLU Avatar Menu (World Fixed)を追加
+	- これは、ParticleLive Setupの高度な設定「Advanced Setup」、Low-effort Uploaderの高度な設定「Generate Avatar Menu」で生成されるものと同等のものを生成します。
 
 ## [2.1.1] - [2025-10-21]
 ### 修正
