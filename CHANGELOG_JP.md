@@ -38,6 +38,13 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 
 ### 脆弱性
 
+## [2.3.0] - [2025-11-05]
+### 追加
+- Tools/PaLASOLU/Extensions/MaterialSeparaterを追加
+
+### 修正
+- Sample/PaLASOLU Introductionのパラメーターをいくつか修正
+
 ## [2.2.0] - [2025-10-28]
 ### 追加
 - Tools/PaLASOLU/Extensions/PaLASOLU Avatar Menu (World Fixed)を追加
