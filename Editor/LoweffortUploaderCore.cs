@@ -23,7 +23,7 @@ namespace PaLASOLU
 		public LoweffortUploader lfUploader;
 		public PlayableDirector director;
 		public TimelineAsset timeline;
-		public Dictionary<string, GameObject> bindings;
+		public Dictionary<int, GameObject> bindings;
 	}
 
 	internal class ProcessContext
@@ -32,7 +32,7 @@ namespace PaLASOLU
 		public LoweffortUploader lfUploader;
 		public PlayableDirector director;
 		public TimelineAsset timeline;
-		public Dictionary<string, GameObject> bindings;
+		public Dictionary<int, GameObject> bindings;
 		public List<(AnimationClip, GameObject)> addClips;
 		public AnimationClip mergedClip;
 		public AudioTrackVolumeData volumeData;
@@ -78,7 +78,7 @@ namespace PaLASOLU
 						lfUploader = lfUploader_finded,
 						director = director_finded,
 						timeline = timeline_finded,
-						bindings = new Dictionary<string, GameObject>()
+						bindings = new Dictionary<int, GameObject>()
 					};
 
 					lfuState.Uploaders.Add(uploaderCtx);
@@ -109,7 +109,7 @@ namespace PaLASOLU
 							continue;
 						}
 						//animatorObjectは紐付けられているGameObjectを取る(AnimatorはNDMFで一度削除されるため)
-						lfuCtx.bindings.Add(track.name, animator.gameObject);
+						lfuCtx.bindings.Add(track.GetInstanceID(), animator.gameObject);
 					}
 				}
 			});
@@ -134,7 +134,7 @@ namespace PaLASOLU
 					TimelineAsset timeline = lfuCtx.timeline;
 					if (timeline == null) return;
 
-					Dictionary<string, GameObject> bindings = lfuCtx.bindings;
+					Dictionary<int, GameObject> bindings = lfuCtx.bindings;
 					if (bindings == null) return;
 
 					AnimationClip mergedClip = new AnimationClip();
@@ -252,7 +252,7 @@ namespace PaLASOLU
 			{
 				AnimationClip sumOfClip = (track as AnimationTrack).infiniteClip;
 				if (sumOfClip == null) sumOfClip = BakeAnimationTrackToMergedClip(track);
-				if (!processCtx.bindings.TryGetValue(track.name, out var clip) || clip == null)
+				if (!processCtx.bindings.TryGetValue(track.GetInstanceID(), out var clip) || clip == null)
 				{
 					LogMessageSimplifier.PaLog(1, $"{track.name} トラックに紐づく GameObject が見つかりません。");
 					return;
