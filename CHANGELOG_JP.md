@@ -5,38 +5,17 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 このプロジェクトは [Semantic Versioning](https://semver.org/lang/ja/) に従っています。
 
 ## [Unreleased & Planned]
+https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 
-### 追加
-- TimelineExtension
-  - BPM基準でタイムラインを触れるようにする
-  - GameObjectの名称変更にAnimationが追従するようにする
-  - 「0打ち」をしなくていいようにする
-  - その他、Timelineを使いやすくする様々な機能
-- Timelineチュートリアル
-- Export Prefab without Timeline
-- Infinite Clip Baker
-- Avatar Root Motion(Action Layer / not-VRChatAvatar Animator)
-- Particle Curve Inverter - ParticleCurveを上下/左右反転させる機能
-- Simulate Layer = Everythingにする ← 全ての試みが、失敗……
+## [2.3.1] - [2026-01-05]
+あけましておめでとうございます。今年もPaLASOLUをよろしくお願いします。
 
-### 変更
-- AudioClip.Create()を用いて、元のAudioClipのLoadInBackgroundを変更しないようにする
-
-### 修正
-- Low-effort Uploader : AnimationClipをLoopさせる場合に、良い感じの法線を設定する
-- Low-effort Uploader : AnimationClipがブレンドされる場合に対応する
-- Low-effort Uploader : Playable Directorが別のGameObjectについている場合、Generate Avatar Menuが正しく動作しない
-- Low-effort Uploader : 一部の環境で無駄に重いのを修正する
-
-### 削除
-
-### 調査
-- VRCQuestToolsとの互換性 or アラートを出す
-
-### 非推奨
-- (PaLASOLUの非推奨ではなく、PaLASOLUからPlayableDirectorへの"非推奨の要求"として、)Playable Track, Signal Track対応はVRC AvatarにScriptを含めることができないので、対応予定がありません
-
-### 脆弱性
+## 修正
+- `com.vrchat.avatars`の前提を外しました。これにより、各種ツール類などをワールドパッケージその他にも導入することができます。
+  - PaLASOLUが付いた状態のTimelineをワールドにアップロードした際の挙動は未確認です。
+- ついでに`nadena.dev.modular-avatar`の最新版を前提としました。
+  - 最新版に追従してほしいという思想の表れです。
+- [#7] TimelineTrackが同一名称の時にエラーで止まるバグを修正
 
 ## [2.3.0] - [2025-11-05]
 ### 追加
