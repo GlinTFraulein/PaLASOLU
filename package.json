@@ -1,11 +1,11 @@
 {
     "name" : "info.glintfraulein.palasolu",
     "displayName" : "PaLASOLU",
-    "version" : "2.4.0-a",
+    "version" : "2.4.0-b",
     "unity" : "2022.3",
     "description" : "Particle Live Avatar Setup Optimization & Low-effort Uploader",
 
-    "url" : "https://github.com/GlinTFraulein/PaLASOLU/releases/download/2.4.0-a/info.glintfraulein.palasolu.2.4.0-a.zip?",
+    "url" : "https://github.com/GlinTFraulein/PaLASOLU/releases/download/2.4.0-b/info.glintfraulein.palasolu.2.4.0-b.zip?",
     "repo" : "https://GlinTFraulein.github.io/vpm/index.json",
     "documentationUrl": "https://glintfraulein.info/PaLASOLU",
 
