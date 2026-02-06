@@ -7,7 +7,7 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 
-## [2.4.0-a][2.4.0-b] - [2026-02-06]
+## [2.4.0-a][2.4.0-b][2.4.0-c] - [2026-02-06]
 ### 追加
 - PresetApplier for lilToon
   - 現状は嘘実装(とあるイベント用の急造品です)
