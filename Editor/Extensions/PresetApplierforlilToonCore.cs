@@ -86,6 +86,12 @@ namespace PaLASOLU
 			}
 			*/
 			mat.SetFloat("_LightMinLimit", 0);
+			mat.SetFloat("_EmissionFluorescence", 1);
+			mat.SetFloat("_Emission2ndFluorescence", 1);
+			mat.SetFloat("_MatCapEnableLighting", 1);
+			mat.SetFloat("_MatCap2ndEnableLighting", 1);
+			mat.SetFloat("_RimEnableLighting", 1);
+			mat.SetFloat("_GlitterEnableLighting", 1);
 		}
 	}
 }
