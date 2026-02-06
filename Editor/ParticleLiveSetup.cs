@@ -62,7 +62,7 @@ namespace PaLASOLU
 			{
 				if (rootFolderName == string.Empty)
 				{
-					LogMessageSimplifier.PaLog(2, "フォルダ名がありません。");
+					LogMessageSimplifier.PaLog(2, "フォルダ名がありません！フォルダ名を入力して、再度試してください。");
 					return;
 				}
 
