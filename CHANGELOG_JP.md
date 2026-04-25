@@ -7,6 +7,10 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 
+## [2.4.0-d] - [2026-04-26]
+### 追加
+- FixParticleSystemAllowRoll
+
 ## [2.4.0-a][2.4.0-b][2.4.0-c] - [2026-02-06]
 ### 追加
 - PresetApplier for lilToon
