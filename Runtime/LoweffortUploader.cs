@@ -17,6 +17,7 @@ namespace PaLASOLU
 		public bool generateAvatarMenu = false;
 		public bool generateAudioObject = true;
 		public bool isAffectedAudioVolume = true;
+		public bool isFixedAllowRoll = true;
 
 		//private Dictionary<int, double> audioVolume;	将来的にやる
 
@@ -57,6 +58,7 @@ namespace PaLASOLU
 					uploader.director = EditorGUILayout.ObjectField("PlayableDirector", uploader.director, typeof(PlayableDirector), true) as PlayableDirector;
 					uploader.generateAudioObject = EditorGUILayout.Toggle("Generate Audio object", uploader.generateAudioObject);
 					uploader.isAffectedAudioVolume = EditorGUILayout.Toggle("Affect AudioTrack Volume ", uploader.isAffectedAudioVolume);
+					uploader.isFixedAllowRoll = EditorGUILayout.Toggle("Fix Allow Roll", uploader.isFixedAllowRoll);
 				}
 
 				if (GUI.changed)

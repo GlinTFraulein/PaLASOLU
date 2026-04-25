@@ -161,7 +161,26 @@ namespace PaLASOLU
 					foreach (TrackAsset track in lfuCtx.timeline.GetOutputTracks())
 					{
 						ProcessTrack(track, processCtx);
+					}
 
+					//ParticleSystem Allow Roll Fix
+					if (processCtx.lfuCtx.lfUploader.isFixedAllowRoll)
+					{
+						HashSet<ParticleSystem> systems = new HashSet<ParticleSystem>();
+
+						foreach (GameObject go in bindings.Values)
+						{
+							if (go == null) continue;
+
+							ParticleSystem[] found = go.GetComponentsInChildren<ParticleSystem>(true);
+							foreach (ParticleSystem ps in found)
+							{
+								if (ps != null) systems.Add(ps);
+							}
+						}
+
+						// 呼び出し
+						FixParticleSystemAllowRoll.FixAllowRoll(systems, destructive: false); // NDMF
 					}
 
 					addClips.Add((mergedClip, lfUploader.gameObject));
@@ -629,5 +648,7 @@ namespace PaLASOLU
 
 			return uniqueName;
 		}
+
+
 	}
 }
