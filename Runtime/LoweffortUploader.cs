@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -21,9 +20,6 @@ namespace PaLASOLU
 
 		//private Dictionary<int, double> audioVolume;	将来的にやる
 
-		const string bannerPath = "Packages/info.glintfraulein.palasolu//Image/PaLASOLU_Banner.png";
-		static Texture banner = null;
-
 #if UNITY_EDITOR
 		private void Reset()
 		{
@@ -38,16 +34,11 @@ namespace PaLASOLU
 		public class LfUploaderEditor : Editor
 		{
 			bool advancedSettings = false;
-			void OnEnable()
-			{
-				banner = AssetDatabase.LoadAssetAtPath<Texture>(bannerPath);
-			}
+
 
 			public override void OnInspectorGUI()
 			{
-				DrawBanner();
-
-				GUILayout.Space(8);
+				PaLASOLURuntimeUtility.DrawBanner();
 
 				LoweffortUploader uploader = (LoweffortUploader)target;
 				EditorGUILayout.HelpBox("このスクリプトとPlayable Directorコンポーネントが同じGameObjectに付いている場合、適切な処理をしてアップロードを行います。\n誤操作防止のために、このスクリプトが付いている場合は、Playable Directorを削除できません。", MessageType.Info);
@@ -66,30 +57,6 @@ namespace PaLASOLU
 					if (uploader.director != null) uploader.timeline = uploader.director.playableAsset as TimelineAsset;
 					EditorUtility.SetDirty(uploader);
 				}
-			}
-
-			private void DrawBanner()
-			{
-				if (banner == null)
-				{
-					Debug.Log("[PaLASOLU] Internal Error : banner is null.");
-					return;
-				}
-
-
-				float inspectorWidth = EditorGUIUtility.currentViewWidth;
-				float maxWidth = 512f;
-				float displayWidth = Mathf.Min(inspectorWidth - 20f, maxWidth); // -20fはマージン分
-
-				float aspect = (float)banner.height / banner.width;
-				float displayHeight = displayWidth * aspect;
-
-				float xOffset = (inspectorWidth - displayWidth) * 0.5f;
-				Rect rect = GUILayoutUtility.GetRect(displayWidth, displayHeight, GUILayout.ExpandWidth(false));
-
-				rect.x = xOffset;
-
-				GUI.DrawTexture(rect, banner, ScaleMode.ScaleToFit);
 			}
 		}
 #endif
