@@ -1,7 +1,10 @@
-﻿#if UNITY_EDITOR
+﻿using lilToon;
 using nadena.dev.ndmf;
+using nadena.dev.ndmf.fluent;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 [assembly: ExportsPlugin(typeof(PaLASOLU.PresetApplierforlilToonCore))]
@@ -14,14 +17,26 @@ namespace PaLASOLU
 
 		protected override void Configure()
 		{
+			PresetApplierforlilToon applier;
+
 			InPhase(BuildPhase.Transforming).Run("Apply LilToon Preset", ctx =>
 			{
 				GameObject avatarRoot = ctx.AvatarRootObject;
-				PresetApplierforlilToon applier = avatarRoot.GetComponentsInChildren<PresetApplierforlilToon>(true).FirstOrDefault();
+				applier = avatarRoot.GetComponentsInChildren<PresetApplierforlilToon>(true).FirstOrDefault();
 
 				if (applier == null /*|| applier.liltoonPreset == null*/) return;
 				ApplyPreset(ctx, applier);
 			});
+
+			Sequence postProcess = InPhase(BuildPhase.Optimizing);
+			postProcess.BeforePlugin("com.anatawa12.avatar-optimizer");
+			postProcess.Run("Apply lilToon Preset Post Process", ctx =>
+			{
+				GameObject avatarRoot = ctx.AvatarRootObject;
+				applier = avatarRoot.GetComponentsInChildren<PresetApplierforlilToon>(true).FirstOrDefault();
+				UnityEngine.Object.DestroyImmediate(applier);
+			});
+
 		}
 
 		private void ApplyPreset(BuildContext ctx, PresetApplierforlilToon applier)
@@ -45,7 +60,7 @@ namespace PaLASOLU
 						mappedMat = new Material(mat);
 						mappedMat.name = $"{mat.name}_applied";
 
-						ApplyLiltoonPreset(mappedMat/*, applier.liltoonPreset*/);
+						ApplyLiltoonPreset(mappedMat, applier.lilToonPreset);
 						matCache.Add(mat, mappedMat);
 					}
 
@@ -66,33 +81,92 @@ namespace PaLASOLU
 			return shader.name.Contains("lilToon");
 		}
 
-		private void ApplyLiltoonPreset(Material mat/*, Object preset*/)
-		{/*
-			if (_applyMethod == null)
-			{
-				_applyMethod = preset.GetType().GetMethod(
-					"Apply",
-					System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public
-				);
-			}
+		/* ApplyLiltoonPreset is used modified lilToon resorces. (lilToon/Assets/lilToon/Editor/lilToonEditorUtils.cs)
+		* https://github.com/lilxyzw/lilToon/blob/master/Assets/lilToon/Editor/lilToonEditorUtils.cs
+		* 
+		*	MIT License
+		*	
+		*	Copyright (c) 2020-2024 lilxyzw
+		*	
+		*	Permission is hereby granted, free of charge, to any person obtaining a copy
+		*	of this software and associated documentation files (the "Software"), to deal
+		*	in the Software without restriction, including without limitation the rights
+		*	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+		*	copies of the Software, and to permit persons to whom the Software is
+		*	furnished to do so, subject to the following conditions:
+		*	
+		*	The above copyright notice and this permission notice shall be included in all
+		*	copies or substantial portions of the Software.
+		*	
+		*	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+		*	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+		*	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+		*	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+		*	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+		*	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+		*	SOFTWARE.
+		*
+		*/
 
-			if (_applyMethod != null)
+		private void ApplyLiltoonPreset(Material material, lilToonPreset preset/*, bool ismulti*/)
+		{
+			if (material == null || preset == null) return;
+			Undo.RecordObject(material, "Apply Preset");
+			foreach (var f in preset.floats.Where(f => f.name == "_StencilPass"))
 			{
-				_applyMethod.Invoke(preset, new object[] { mat });
+				material.SetFloat(f.name, f.value);
+			}
+			if (preset.shader != null) material.shader = preset.shader;
+			var shaderName = material.shader.name;
+			bool isoutl = preset.outline == -1 ? lilShaderUtils.IsOutlineShaderName(shaderName) : (preset.outline == 1);
+			bool istess = preset.tessellation == -1 ? lilShaderUtils.IsTessellationShaderName(shaderName) : (preset.tessellation == 1);
+
+			bool islite = lilShaderUtils.IsLiteShaderName(shaderName);
+			bool iscutout = lilShaderUtils.IsCutoutShaderName(shaderName);
+			bool istransparent = lilShaderUtils.IsTransparentShaderName(shaderName);
+			bool isrefr = lilShaderUtils.IsRefractionShaderName(shaderName);
+			bool isblur = lilShaderUtils.IsBlurShaderName(shaderName);
+			bool isfur = lilShaderUtils.IsFurShaderName(shaderName);
+			bool isonepass = lilShaderUtils.IsOnePassShaderName(shaderName);
+			bool istwopass = lilShaderUtils.IsTwoPassShaderName(shaderName);
+
+			var renderingMode = RenderingMode.Opaque;
+
+			//if(string.IsNullOrEmpty(preset.renderingMode) || !Enum.TryParse(preset.renderingMode, out renderingMode))
+			if (string.IsNullOrEmpty(preset.renderingMode) || !Enum.IsDefined(typeof(RenderingMode), preset.renderingMode))
+			{
+				if (iscutout) renderingMode = RenderingMode.Cutout;
+				if (istransparent) renderingMode = RenderingMode.Transparent;
+				if (isrefr) renderingMode = RenderingMode.Refraction;
+				if (isrefr && isblur) renderingMode = RenderingMode.RefractionBlur;
+				if (isfur) renderingMode = RenderingMode.Fur;
+				if (isfur && iscutout) renderingMode = RenderingMode.FurCutout;
+				if (isfur && istwopass) renderingMode = RenderingMode.FurTwoPass;
 			}
 			else
 			{
-				LogMessageSimplifier.PaLog(4, $"lilToon preset ApplyToMaterial not found");
+				renderingMode = (RenderingMode)Enum.Parse(typeof(RenderingMode), preset.renderingMode);
 			}
-			*/
-			mat.SetFloat("_LightMinLimit", 0);
-			mat.SetFloat("_EmissionFluorescence", 1);
-			mat.SetFloat("_Emission2ndFluorescence", 1);
-			mat.SetFloat("_MatCapEnableLighting", 1);
-			mat.SetFloat("_MatCap2ndEnableLighting", 1);
-			mat.SetFloat("_RimEnableLighting", 1);
-			mat.SetFloat("_GlitterEnableLighting", 1);
+
+			var transparentMode = TransparentMode.Normal;
+			if (isonepass) transparentMode = TransparentMode.OnePass;
+			if (!isfur && istwopass) transparentMode = TransparentMode.TwoPass;
+
+			//lilMaterialUtils.SetupMaterialWithRenderingMode(material, renderingMode, transparentMode, isoutl, islite, istess, ismulti);
+			if (preset.renderQueue != -2) material.renderQueue = preset.renderQueue;
+
+			foreach (var c in preset.colors) material.SetColor(c.name, c.value);
+			foreach (var v in preset.vectors) material.SetVector(v.name, v.value);
+			foreach (var f in preset.floats) material.SetFloat(f.name, f.value);
+			foreach (var t in preset.textures)
+			{
+				material.SetTexture(t.name, t.value);
+				material.SetTextureOffset(t.name, t.offset);
+				material.SetTextureScale(t.name, t.scale);
+			}
+
+			if (preset.outlineMainTex) material.SetTexture("_OutlineTex", material.GetTexture("_MainTex"));
 		}
+
 	}
 }
-#endif
