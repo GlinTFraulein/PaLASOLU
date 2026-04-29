@@ -13,7 +13,7 @@ Playable Directorをつけたままでもパーティクルライブ付アバタ
 
 
 ## 既知の不具合
-今のところないので、あったら教えてください！
+https://github.com/GlinTFraulein/PaLASOLU/issues に書いてあります。
 
 (自分向け 更新手順)
 1. package.json, LogMessageSimplifierのバージョン番号を変更（例：1.0.0→1.1.0）

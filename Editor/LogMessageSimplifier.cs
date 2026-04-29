@@ -4,7 +4,7 @@ namespace PaLASOLU
 {
 	public class LogMessageSimplifier
 	{
-		const string version = "2.4.0-e";
+		const string version = "2.4.0-f";
 		public static void PaLog(int num, string message)
 		{
 			string returnMessage = $"[PaLASOLU {version}]";
