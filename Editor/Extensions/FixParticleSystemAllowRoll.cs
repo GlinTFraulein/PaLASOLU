@@ -15,7 +15,6 @@ namespace PaLASOLU
 		/// </param>
 		public static void FixAllowRoll(IEnumerable<ParticleSystem> systems, bool destructive)
 		{
-			LogMessageSimplifier.PaLog(3, $"Allow Roll in");
 			if (systems == null) return;
 
 			// 重複排除
@@ -27,7 +26,6 @@ namespace PaLASOLU
 				uniqueSystems.Add(ps);
 			}
 
-			LogMessageSimplifier.PaLog(3, $"ps count: {uniqueSystems.Count}");
 			foreach (var ps in uniqueSystems)
 			{
 				var renderer = ps.GetComponent<ParticleSystemRenderer>();
