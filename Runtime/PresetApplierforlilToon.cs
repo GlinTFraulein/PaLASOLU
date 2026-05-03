@@ -7,9 +7,9 @@ namespace PaLASOLU
 	[AddComponentMenu("PaLASOLU/PaLASOLU PresetApplier for lilToon")]
 	public class PresetApplierforlilToon : MonoBehaviour, IEditorOnly
 	{
+#if UNITY_EDITOR
 		public lilToonPreset lilToonPreset;
 
-#if UNITY_EDITOR
 		[CustomEditor(typeof(PresetApplierforlilToon))]
 		public class PresetApplierforlilToonEditor : Editor
 		{
