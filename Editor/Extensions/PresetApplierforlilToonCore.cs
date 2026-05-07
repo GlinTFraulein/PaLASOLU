@@ -1,4 +1,6 @@
-﻿using lilToon;
+﻿#if PaLASOLU_LILTOON
+
+using lilToon;
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.fluent;
 using System;
@@ -167,6 +169,7 @@ namespace PaLASOLU
 
 			if (preset.outlineMainTex) material.SetTexture("_OutlineTex", material.GetTexture("_MainTex"));
 		}
-
 	}
 }
+
+#endif

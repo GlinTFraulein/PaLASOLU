@@ -18,6 +18,17 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.vrchat.avatars",
+            "expression": "",
+            "define": "PaLASOLU_SDK3_AVATARS"
+        },
+        {
+            "name": "jp.lilxyzw.liltoon",
+            "expression": "",
+            "define": "PaLASOLU_LILTOON"
+        }
+    ],
     "noEngineReferences": false
 }

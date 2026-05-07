@@ -8,7 +8,10 @@ namespace PaLASOLU
 	public class PresetApplierforlilToon : MonoBehaviour, IEditorOnly
 	{
 #if UNITY_EDITOR
+
+#if PaLASOLU_LILTOON
 		public lilToonPreset lilToonPreset;
+#endif
 
 		[CustomEditor(typeof(PresetApplierforlilToon))]
 		public class PresetApplierforlilToonEditor : Editor
@@ -16,12 +19,15 @@ namespace PaLASOLU
 			public override void OnInspectorGUI()
 			{
 				PaLASOLURuntimeUtility.DrawBanner();
-
+#if PaLASOLU_LILTOON
 				PresetApplierforlilToon pafliltoon = (PresetApplierforlilToon)target;
 				EditorGUILayout.HelpBox("このスクリプトにlilToonのプリセットを設定すると、アップロード時にアバター内のlilToonが用いられているマテリアルに対して、プリセットを適用した状態に設定します。", MessageType.Info);
 				EditorGUILayout.HelpBox("このスクリプトは現在仮実装です！うまく動作しない場合などは作者 GlinTFraulein に報告してください。", MessageType.Warning);
 
 				pafliltoon.lilToonPreset = EditorGUILayout.ObjectField("lilToon Preset", pafliltoon.lilToonPreset, typeof(lilToonPreset), true) as lilToonPreset; //ScriptableObject
+#else
+				EditorGUILayout.HelpBox("プロジェクトにlilToonがインポートされていません！このコンポーネントは無効化されます。", MessageType.Warning);
+#endif
 			}
 		}
 

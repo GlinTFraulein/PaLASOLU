@@ -1,19 +1,25 @@
 {
-	"name": "info.glintfraulein.palasolu.runtime",
-	"rootNamespace": "",
-	"references": [
-		"Unity.Timeline",
-		"nadena.dev.modular-avatar",
-		"nadena.dev.ndmf",
-		"lilToon.Editor"
-	],
-	"includePlatforms": [],
-	"excludePlatforms": [],
-	"allowUnsafeCode": false,
-	"overrideReferences": false,
-	"precompiledReferences": [],
-	"autoReferenced": false,
-	"defineConstraints": [],
-	"versionDefines": [],
-	"noEngineReferences": false
+    "name": "info.glintfraulein.palasolu.runtime",
+    "rootNamespace": "",
+    "references": [
+        "Unity.Timeline",
+        "nadena.dev.modular-avatar",
+        "nadena.dev.ndmf",
+        "lilToon.Editor"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "jp.lilxyzw.liltoon",
+            "expression": "",
+            "define": "PaLASOLU_LILTOON"
+        }
+    ],
+    "noEngineReferences": false
 }
