@@ -199,7 +199,7 @@ namespace PaLASOLU
 			string saveDirectory = directoryPath + "/(PaLASOLU)";
 			if (!Directory.Exists(saveDirectory)) Directory.CreateDirectory(saveDirectory);
 
-			string uniqueName = SetUniqueName(audio.name);
+			string uniqueName = FileAndPathEditExtension.SetUniqueName(audio.name);
 
 			return ExportAndImport(buffer, audio.frequency, audio.channels, saveDirectory + $"/{uniqueName}.wav");
 		}

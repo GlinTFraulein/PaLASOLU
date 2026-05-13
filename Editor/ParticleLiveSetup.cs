@@ -95,7 +95,7 @@ namespace PaLASOLU
 				savePath = "Assets/" + spritPath[1];
 			}
 
-			CreateDirectory(savePath);
+			FileAndPathEditExtension.CreateDirectory(savePath);
 
 			string timelinePath = Path.Combine(savePath, rootFolderName) + "_timeline.playable";
 
@@ -198,21 +198,7 @@ namespace PaLASOLU
 			}
 		}
 
-		static bool CreateDirectory(string path)
-		{
-			if (Directory.Exists(path))
-			{
-				LogMessageSimplifier.PaLog(1, $"{path} フォルダは既に存在します。新しいフォルダは作られません。");
-				return false;
 
-			}
-			else
-			{
-				Directory.CreateDirectory(path);
-				LogMessageSimplifier.PaLog(0, $"{path} フォルダを作りました。");
-				return true;
-			}
-		}
 
 		bool DrawResponsiveToggle(string label, bool value)
 		{

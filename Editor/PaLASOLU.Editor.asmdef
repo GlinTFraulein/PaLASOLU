@@ -1,6 +1,6 @@
 {
     "name": "info.glintfraulein.palasolu.editor",
-    "rootNamespace": "",
+    "rootNamespace": "PaLASOLU",
     "references": [
         "Unity.Timeline",
         "Unity.Timeline.Editor",
