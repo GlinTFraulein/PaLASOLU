@@ -96,6 +96,8 @@ namespace PaLASOLU
 						if (lfUploader_finded.disableOnPlayObject != null)
 						{
 							lfUploader_finded.disableOnPlayObject.transform.parent = prefabInstance.transform.Find("WorldFixed/DisableOnPlay");
+							GameObject defaultViewPosition = prefabInstance.transform.Find("WorldFixed/DisableOnPlay/ViewPosition").gameObject;
+							Object.DestroyImmediate(defaultViewPosition, true);
 						}
 
 						if (lfUploader_finded.localOnlyObject != null)
