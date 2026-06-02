@@ -92,6 +92,17 @@ namespace PaLASOLU
 						prefabInstance.transform.parent = ctx.AvatarRootTransform;
 
 						lfUploader_finded.transform.parent = prefabInstance.transform.Find("WorldFixed");
+
+						if (lfUploader_finded.disableOnPlayObject != null)
+						{
+							lfUploader_finded.disableOnPlayObject.transform.parent = prefabInstance.transform.Find("WorldFixed/DisableOnPlay");
+						}
+
+						if (lfUploader_finded.localOnlyObject != null)
+						{
+							lfUploader_finded.localOnlyObject.transform.parent = prefabInstance.transform.Find("WorldFixed/LocalOnly");
+						}
+
 					}
 
 					lfUploader_finded.gameObject.name = "ParticleLive";

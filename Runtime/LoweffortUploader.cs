@@ -13,6 +13,8 @@ namespace PaLASOLU
 	{
 		public PlayableDirector director;
 		public TimelineAsset timeline;
+		public GameObject disableOnPlayObject;
+		public GameObject localOnlyObject;
 		public bool generateAvatarMenu = false;
 		public bool generateAudioObject = true;
 		public bool isAffectedAudioVolume = true;
@@ -45,7 +47,13 @@ namespace PaLASOLU
 
 				if (advancedSettings = EditorGUILayout.Foldout(advancedSettings, "高度な設定"))
 				{
-					uploader.generateAvatarMenu = EditorGUILayout.Toggle("Generate Avatar Menu", uploader.generateAvatarMenu);
+					if (uploader.generateAvatarMenu = EditorGUILayout.Toggle("Generate Avatar Menu", uploader.generateAvatarMenu))
+					{
+						EditorGUI.indentLevel++;
+						uploader.disableOnPlayObject = EditorGUILayout.ObjectField("Disable on Play Object", uploader.disableOnPlayObject, typeof(GameObject), true) as GameObject;
+						uploader.localOnlyObject = EditorGUILayout.ObjectField("Local Only Object", uploader.localOnlyObject, typeof(GameObject), true) as GameObject;
+						EditorGUI.indentLevel--;
+					}
 					uploader.director = EditorGUILayout.ObjectField("PlayableDirector", uploader.director, typeof(PlayableDirector), true) as PlayableDirector;
 					uploader.generateAudioObject = EditorGUILayout.Toggle("Generate Audio object", uploader.generateAudioObject);
 					uploader.isAffectedAudioVolume = EditorGUILayout.Toggle("Affect AudioTrack Volume ", uploader.isAffectedAudioVolume);
