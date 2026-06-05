@@ -7,7 +7,6 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 
-
 ## [2.4.0] - [2026-06-xx]
 ### 追加
 - PresetApplier for lilToon
@@ -19,6 +18,7 @@ https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 - ParticleLiveSetupのエラー文を少し分かりやすく変更
 - AvatarVaridationHarmonyPatchがVRCSDK-Avatar環境下のみで動作するように
 - [#24] でかい透明のCubeの影が出てくる を修正
+- その他、軽微な修正
 
 ## [2.4.0-g] - [2026-05-13]
 ### 追加
