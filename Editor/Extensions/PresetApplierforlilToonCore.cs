@@ -16,6 +16,7 @@ namespace PaLASOLU
 	public class PresetApplierforlilToonCore : Plugin<PresetApplierforlilToonCore>
 	{
 		private static System.Reflection.MethodInfo _applyMethod;
+		private Dictionary<Material, Material> matCache = new Dictionary<Material, Material>();
 
 		protected override void Configure()
 		{
@@ -43,31 +44,42 @@ namespace PaLASOLU
 
 		private void ApplyPreset(BuildContext ctx, PresetApplierforlilToon applier)
 		{
+			LogMessageSimplifier.PaLog(3, $"In ApplyPreset");
 			Renderer[] renderers = ctx.AvatarRootObject.GetComponentsInChildren<Renderer>(true);
-			Dictionary<Material, Material> matCache = new Dictionary<Material, Material>();
+			List<Renderer> excludes = applier.excludes.ToList();
 
+			//先に例外を処理し、例外を除外設定に入れる
+			LogMessageSimplifier.PaLog(3, $"Exclude");
+			foreach (PresetApplierforlilToon.SpecialSetting setting in applier.specialSettings)
+			{
+				foreach (Renderer specialRenderer in setting.specialRenderers)
+				{
+					Material[] materials = specialRenderer.sharedMaterials;
+
+					for (int i = 0; i < materials.Length; i++)
+					{
+						bool changed = TryApplyLiltoonPreset(ref materials[i], setting.specialPreset, false);
+						LogMessageSimplifier.PaLog(3, $"TryEnd : {changed}");
+					}
+
+					specialRenderer.sharedMaterials = materials;
+					excludes.Add(specialRenderer);
+				}
+			}
+
+			//除外以外
+			LogMessageSimplifier.PaLog(3, $"Exclude igai");
 			foreach (Renderer renderer in renderers)
 			{
+				if (excludes.Contains(renderer)) continue;
+
 				Material[] materials = renderer.sharedMaterials;
 				bool changed = false;
 
 				for (int i = 0; i < materials.Length; i++)
 				{
-					Material mat = materials[i];
-					if (mat == null) continue;
-					if (!IsLiltoon(mat.shader)) continue;
-
-					if (!matCache.TryGetValue(mat, out Material mappedMat))
-					{
-						mappedMat = new Material(mat);
-						mappedMat.name = $"{mat.name}_applied";
-
-						ApplyLiltoonPreset(mappedMat, applier.lilToonPreset);
-						matCache.Add(mat, mappedMat);
-					}
-
-					materials[i] = mappedMat;
-					changed = true;
+					changed = TryApplyLiltoonPreset(ref materials[i], applier.lilToonPreset, true);
+					LogMessageSimplifier.PaLog(3, $"TryEnd : {changed}");
 				}
 
 				if (changed)
@@ -75,6 +87,26 @@ namespace PaLASOLU
 					renderer.sharedMaterials = materials;
 				}
 			}
+		}
+
+		private bool TryApplyLiltoonPreset(ref Material mat, lilToonPreset preset, bool isCached)
+		{
+			LogMessageSimplifier.PaLog(3, $"TryApplyLiltoonPreset, {mat.name}, {preset.name}, {isCached}");
+			if (mat == null) return false;
+			if (!IsLiltoon(mat.shader)) return false;
+
+			if (!matCache.TryGetValue(mat, out Material mappedMat))
+			{
+
+				mappedMat = new Material(mat);
+				mappedMat.name = $"{mat.name}_applied";
+
+				ApplyLiltoonPreset(ref mappedMat, preset);
+				if (isCached) matCache.Add(mat, mappedMat);
+			}
+
+			mat = mappedMat;
+			return true;
 		}
 
 		private bool IsLiltoon(Shader shader)
@@ -110,8 +142,9 @@ namespace PaLASOLU
 		*
 		*/
 
-		private void ApplyLiltoonPreset(Material material, lilToonPreset preset/*, bool ismulti*/)
+		private void ApplyLiltoonPreset(ref Material material, lilToonPreset preset/*, bool ismulti*/)
 		{
+			LogMessageSimplifier.PaLog(3, $"ApplyLiltoonPreset, {material.name}, {preset.name}");
 			if (material == null || preset == null) return;
 			Undo.RecordObject(material, "Apply Preset");
 			foreach (var f in preset.floats.Where(f => f.name == "_StencilPass"))
