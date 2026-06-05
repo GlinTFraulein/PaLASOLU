@@ -7,10 +7,31 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 
+
+## [2.4.0] - [2026-06-xx]
+### 追加
+- PresetApplier for lilToon
+- [#21] Fix ParticleSystem Allow Roll
+- PaLASOLU Playableが直接出せるように
+- [#26] LowEffortUploaderからDisableOnPlay, LocalOnlyを指定可能に
+
+### 修正
+- ParticleLiveSetupのエラー文を少し分かりやすく変更
+- AvatarVaridationHarmonyPatchがVRCSDK-Avatar環境下のみで動作するように
+- [#24] でかい透明のCubeの影が出てくる を修正
+
+## [2.4.0-g] - [2026-05-13]
+### 追加
+PaLASOLU Playableが直接出せるように
+
+### 修正
+- いろいろリファクタリングしたつもり
+
 ## [2.4.0-h] - [2026-05-07]
 ### 修正
 - AvatarVaridationHarmonyPatchがVRCSDK-Avatar環境下のみで動作するように
 - PresetApplier for lilToonがlilToon環境下でのみ動作するように
+- [#24] でかい透明のCubeの影が出てくる を修正
 
 ## [2.4.0-g] - [2026-05-03]
 ### 修正
