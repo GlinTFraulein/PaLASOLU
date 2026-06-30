@@ -293,7 +293,7 @@ Material:
     - _ApplySpecular: 1
     - _ApplySpecularFA: 1
     - _AsOverlay: 0
-    - _AsUnlit: 0
+    - _AsUnlit: 1
     - _AudioLink2Emission: 0
     - _AudioLink2Emission2nd: 0
     - _AudioLink2Emission2ndGrad: 0
