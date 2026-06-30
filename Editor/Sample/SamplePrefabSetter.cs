@@ -17,5 +17,17 @@ namespace PaLASOLU
 			Selection.activeGameObject = introductionObject;
 			EditorUtility.SetDirty(introductionObject);
 		}
+
+		const string attentionPath = "Packages/info.glintfraulein.palasolu/Runtime/Sample/ParticleLive_Attention/ParticleLive_Attention.prefab";
+
+		[MenuItem("Tools/PaLASOLU/Sample/パーティクルライブを観る際の注意事項", priority = 311)]
+		static void SetParticleLiveAttention()
+		{
+			GameObject introductionPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(attentionPath);
+			GameObject introductionObject = PrefabUtility.InstantiatePrefab(introductionPrefab) as GameObject;
+
+			Selection.activeGameObject = introductionObject;
+			EditorUtility.SetDirty(introductionObject);
+		}
 	}
 }
