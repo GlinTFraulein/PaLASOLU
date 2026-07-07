@@ -7,12 +7,17 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 
+## [2.4.1] - [2026-07-08]
+### 修正
+- PresetApplier for lilToonが無駄なInternalLogを吐きまくるせいでNullReferenceExceptionする可能性があったバグを修正
+
 ## [2.4.0] - [2026-06-30] - 遅れてやってきたPaLASOLU 1st Anniversary Update!
 お待たせしました……！PaLASOLUの誕生日は6/10でした(過去形)
 
 ### 追加
 - Sample/パーティクルライブを観る際の注意事項
 - PresetApplier for lilToon
+- PaLASOLU Play Trigger
 - [#21] Fix ParticleSystem Allow Roll
 - PaLASOLU Playableが直接出せるように
 - [#26] LowEffortUploaderからDisableOnPlay, LocalOnlyを指定可能に

@@ -44,12 +44,10 @@ namespace PaLASOLU
 
 		private void ApplyPreset(BuildContext ctx, PresetApplierforlilToon applier)
 		{
-			LogMessageSimplifier.PaLog(3, $"In ApplyPreset");
 			Renderer[] renderers = ctx.AvatarRootObject.GetComponentsInChildren<Renderer>(true);
 			List<Renderer> excludes = applier.excludes.ToList();
 
 			//先に例外を処理し、例外を除外設定に入れる
-			LogMessageSimplifier.PaLog(3, $"Exclude");
 			foreach (PresetApplierforlilToon.SpecialSetting setting in applier.specialSettings)
 			{
 				foreach (Renderer specialRenderer in setting.specialRenderers)
@@ -59,7 +57,6 @@ namespace PaLASOLU
 					for (int i = 0; i < materials.Length; i++)
 					{
 						bool changed = TryApplyLiltoonPreset(ref materials[i], setting.specialPreset, false);
-						LogMessageSimplifier.PaLog(3, $"TryEnd : {changed}");
 					}
 
 					specialRenderer.sharedMaterials = materials;
@@ -68,7 +65,6 @@ namespace PaLASOLU
 			}
 
 			//除外以外
-			LogMessageSimplifier.PaLog(3, $"Exclude igai");
 			foreach (Renderer renderer in renderers)
 			{
 				if (excludes.Contains(renderer)) continue;
@@ -79,7 +75,6 @@ namespace PaLASOLU
 				for (int i = 0; i < materials.Length; i++)
 				{
 					changed = TryApplyLiltoonPreset(ref materials[i], applier.lilToonPreset, true);
-					LogMessageSimplifier.PaLog(3, $"TryEnd : {changed}");
 				}
 
 				if (changed)
@@ -91,7 +86,6 @@ namespace PaLASOLU
 
 		private bool TryApplyLiltoonPreset(ref Material mat, lilToonPreset preset, bool isCached)
 		{
-			LogMessageSimplifier.PaLog(3, $"TryApplyLiltoonPreset, {mat.name}, {preset.name}, {isCached}");
 			if (mat == null) return false;
 			if (!IsLiltoon(mat.shader)) return false;
 
@@ -144,7 +138,6 @@ namespace PaLASOLU
 
 		private void ApplyLiltoonPreset(ref Material material, lilToonPreset preset/*, bool ismulti*/)
 		{
-			LogMessageSimplifier.PaLog(3, $"ApplyLiltoonPreset, {material.name}, {preset.name}");
 			if (material == null || preset == null) return;
 			Undo.RecordObject(material, "Apply Preset");
 			foreach (var f in preset.floats.Where(f => f.name == "_StencilPass"))
