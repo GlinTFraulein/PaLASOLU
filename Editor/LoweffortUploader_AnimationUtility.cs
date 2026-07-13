@@ -53,6 +53,7 @@ namespace PaLASOLU
 			};
 
 			Dictionary<EditorCurveBinding, CurveAccumulator> curveAccumulators = new Dictionary<EditorCurveBinding, CurveAccumulator>();
+			Dictionary<EditorCurveBinding, List<ObjectReferenceKeyframe>> objectCurveAccumulators = new Dictionary<EditorCurveBinding, List<ObjectReferenceKeyframe>>();
 
 			foreach (TimelineClip clip in timelineClips)
 			{
@@ -166,17 +167,13 @@ namespace PaLASOLU
 						}
 					}
 
-					ObjectReferenceKeyframe[] existing = AnimationUtility.GetObjectReferenceCurve(mergedClip, binding);
-					if (existing != null && existing.Length > 0)
+					if (!objectCurveAccumulators.TryGetValue(binding, out List<ObjectReferenceKeyframe> accumulator))
 					{
-						//Sort to Time
-						var merged = existing.Concat(newKeys).OrderBy(kf => kf.time).ToArray();
-						AnimationUtility.SetObjectReferenceCurve(mergedClip, binding, merged);
+						accumulator = new List<ObjectReferenceKeyframe>();
+						objectCurveAccumulators.Add(binding, accumulator);
 					}
-					else
-					{
-						AnimationUtility.SetObjectReferenceCurve(mergedClip, binding, newKeys.ToArray());
-					}
+
+					accumulator.AddRange(newKeys);
 				}
 
 			}
@@ -202,6 +199,21 @@ namespace PaLASOLU
 			{
 				AnimationUtility.SetEditorCurves(mergedClip, mergedBindings, mergedCurves);
 			}
+
+			EditorCurveBinding[] mergedObjectBindings = new EditorCurveBinding[objectCurveAccumulators.Count];
+			ObjectReferenceKeyframe[][] mergedObjectCurves = new ObjectReferenceKeyframe[objectCurveAccumulators.Count][];
+			int objectCurveIndex = 0;
+			foreach (KeyValuePair<EditorCurveBinding, List<ObjectReferenceKeyframe>> pair in objectCurveAccumulators)
+			{
+				mergedObjectBindings[objectCurveIndex] = pair.Key;
+				mergedObjectCurves[objectCurveIndex] = pair.Value.OrderBy(key => key.time).ToArray();
+				objectCurveIndex++;
+			}
+			if (mergedObjectBindings.Length > 0)
+			{
+				AnimationUtility.SetObjectReferenceCurves(mergedClip, mergedObjectBindings, mergedObjectCurves);
+			}
+
 			LogMessageSimplifier.PaLog(0, $"MergedClip generated: {mergedClip.name}");
 			return mergedClip;
 		}
