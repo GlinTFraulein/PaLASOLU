@@ -11,6 +11,25 @@ namespace PaLASOLU
 {
 	public partial class LoweffortUploaderCore : Plugin<LoweffortUploaderCore>
 	{
+		private sealed class CurveAccumulator
+		{
+			public readonly List<Keyframe> Keys = new List<Keyframe>();
+			public readonly HashSet<float> KeyTimes = new HashSet<float>();
+			public readonly WrapMode PreWrapMode;
+			public readonly WrapMode PostWrapMode;
+
+			public CurveAccumulator(AnimationCurve sourceCurve)
+			{
+				PreWrapMode = sourceCurve.preWrapMode;
+				PostWrapMode = sourceCurve.postWrapMode;
+			}
+
+			public void Add(Keyframe key)
+			{
+				if (KeyTimes.Add(key.time)) Keys.Add(key);
+			}
+		}
+
 		public static AnimationClip BakeAnimationTrackToMergedClip(TrackAsset track)
 		{
 			if (track is not AnimationTrack animationTrack)
@@ -32,6 +51,8 @@ namespace PaLASOLU
 				name = $"{track.name}_Merged",
 				legacy = false
 			};
+
+			Dictionary<EditorCurveBinding, CurveAccumulator> curveAccumulators = new Dictionary<EditorCurveBinding, CurveAccumulator>();
 
 			foreach (TimelineClip clip in timelineClips)
 			{
@@ -111,18 +132,15 @@ namespace PaLASOLU
 					List<Keyframe> validKeys = allKeys.Where(k => k.time <= endTime).ToList();
 					newCurve.keys = validKeys.ToArray();
 
-					AnimationCurve existing = AnimationUtility.GetEditorCurve(mergedClip, binding);
-					if (existing != null)
+					if (!curveAccumulators.TryGetValue(binding, out CurveAccumulator accumulator))
 					{
-						foreach (var key in newCurve.keys)
-						{
-							existing.AddKey(key);
-						}
-						AnimationUtility.SetEditorCurve(mergedClip, binding, existing);
+						accumulator = new CurveAccumulator(curve);
+						curveAccumulators.Add(binding, accumulator);
 					}
-					else
+
+					foreach (Keyframe key in newCurve.keys)
 					{
-						AnimationUtility.SetEditorCurve(mergedClip, binding, newCurve);
+						accumulator.Add(key);
 					}
 				}
 
@@ -163,6 +181,27 @@ namespace PaLASOLU
 
 			}
 
+			EditorCurveBinding[] mergedBindings = new EditorCurveBinding[curveAccumulators.Count];
+			AnimationCurve[] mergedCurves = new AnimationCurve[curveAccumulators.Count];
+			int curveIndex = 0;
+			foreach (KeyValuePair<EditorCurveBinding, CurveAccumulator> pair in curveAccumulators)
+			{
+				CurveAccumulator accumulator = pair.Value;
+				AnimationCurve curve = new AnimationCurve
+				{
+					keys = accumulator.Keys.ToArray(),
+					preWrapMode = accumulator.PreWrapMode,
+					postWrapMode = accumulator.PostWrapMode
+				};
+
+				mergedBindings[curveIndex] = pair.Key;
+				mergedCurves[curveIndex] = curve;
+				curveIndex++;
+			}
+			if (mergedBindings.Length > 0)
+			{
+				AnimationUtility.SetEditorCurves(mergedClip, mergedBindings, mergedCurves);
+			}
 			LogMessageSimplifier.PaLog(0, $"MergedClip generated: {mergedClip.name}");
 			return mergedClip;
 		}
