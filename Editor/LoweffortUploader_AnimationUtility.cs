@@ -11,14 +11,14 @@ namespace PaLASOLU
 {
 	public partial class LoweffortUploaderCore : Plugin<LoweffortUploaderCore>
 	{
-		private sealed class CurveAccumulator
+		private sealed class FloatCurveAccumulator
 		{
 			public readonly List<Keyframe> Keys = new List<Keyframe>();
 			public readonly HashSet<float> KeyTimes = new HashSet<float>();
 			public readonly WrapMode PreWrapMode;
 			public readonly WrapMode PostWrapMode;
 
-			public CurveAccumulator(AnimationCurve sourceCurve)
+			public FloatCurveAccumulator(AnimationCurve sourceCurve)
 			{
 				PreWrapMode = sourceCurve.preWrapMode;
 				PostWrapMode = sourceCurve.postWrapMode;
@@ -52,7 +52,7 @@ namespace PaLASOLU
 				legacy = false
 			};
 
-			Dictionary<EditorCurveBinding, CurveAccumulator> curveAccumulators = new Dictionary<EditorCurveBinding, CurveAccumulator>();
+			Dictionary<EditorCurveBinding, FloatCurveAccumulator> curveAccumulators = new Dictionary<EditorCurveBinding, FloatCurveAccumulator>();
 			Dictionary<EditorCurveBinding, List<ObjectReferenceKeyframe>> objectCurveAccumulators = new Dictionary<EditorCurveBinding, List<ObjectReferenceKeyframe>>();
 
 			foreach (TimelineClip clip in timelineClips)
@@ -133,9 +133,9 @@ namespace PaLASOLU
 					List<Keyframe> validKeys = allKeys.Where(k => k.time <= endTime).ToList();
 					newCurve.keys = validKeys.ToArray();
 
-					if (!curveAccumulators.TryGetValue(binding, out CurveAccumulator accumulator))
+					if (!curveAccumulators.TryGetValue(binding, out FloatCurveAccumulator accumulator))
 					{
-						accumulator = new CurveAccumulator(curve);
+						accumulator = new FloatCurveAccumulator(curve);
 						curveAccumulators.Add(binding, accumulator);
 					}
 
@@ -181,9 +181,9 @@ namespace PaLASOLU
 			EditorCurveBinding[] mergedBindings = new EditorCurveBinding[curveAccumulators.Count];
 			AnimationCurve[] mergedCurves = new AnimationCurve[curveAccumulators.Count];
 			int curveIndex = 0;
-			foreach (KeyValuePair<EditorCurveBinding, CurveAccumulator> pair in curveAccumulators)
+			foreach (KeyValuePair<EditorCurveBinding, FloatCurveAccumulator> pair in curveAccumulators)
 			{
-				CurveAccumulator accumulator = pair.Value;
+				FloatCurveAccumulator accumulator = pair.Value;
 				AnimationCurve curve = new AnimationCurve
 				{
 					keys = accumulator.Keys.ToArray(),
