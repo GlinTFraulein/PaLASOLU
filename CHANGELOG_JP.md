@@ -7,6 +7,13 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 
+## [2.5.0-a] - [2026-08-05]
+### 追加
+- PPS Quick Setup
+
+### 修正
+- [#9] 一部の環境でLow-effort Uploaderがやたら遅かったのが修正されたかもしれません
+
 ## [2.4.1] - [2026-07-08]
 ### 修正
 - PresetApplier for lilToonが無駄なInternalLogを吐きまくるせいでNullReferenceExceptionする可能性があったバグを修正
