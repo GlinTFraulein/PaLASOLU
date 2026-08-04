@@ -7,7 +7,8 @@
         "nadena.dev.modular-avatar.core",
         "nadena.dev.ndmf",
         "info.glintfraulein.palasolu.runtime",
-        "lilToon.Editor"
+        "lilToon.Editor",
+        "Unity.Postprocessing.Runtime"
     ],
     "includePlatforms": [
         "Editor"
