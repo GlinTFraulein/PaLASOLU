@@ -53,6 +53,29 @@ namespace PaLASOLU
 				{
 					string lfUploader_ObjectName = lfUploader_finded.gameObject.name;
 
+					if (lfUploader_finded.generateAvatarMenu)
+					{
+						GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ParticleLiveSetup.basePrefabPath);
+						GameObject prefabInstance = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
+						PrefabUtility.UnpackPrefabInstance(prefabInstance, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+						prefabInstance.name = lfUploader_finded.gameObject.name + "_Base";
+						prefabInstance.transform.parent = ctx.AvatarRootTransform;
+
+						lfUploader_finded.transform.parent = prefabInstance.transform.Find("WorldFixed");
+
+						if (lfUploader_finded.disableOnPlayObject != null)
+						{
+							lfUploader_finded.disableOnPlayObject.transform.parent = prefabInstance.transform.Find("WorldFixed/DisableOnPlay");
+							GameObject defaultViewPosition = prefabInstance.transform.Find("WorldFixed/DisableOnPlay/ViewPosition").gameObject;
+							Object.DestroyImmediate(defaultViewPosition, true);
+						}
+
+						if (lfUploader_finded.localOnlyObject != null)
+						{
+							lfUploader_finded.localOnlyObject.transform.parent = prefabInstance.transform.Find("WorldFixed/LocalOnly");
+						}
+					}
+
 					PlayableDirector director_finded = lfUploader_finded.director;
 					if (director_finded == null)
 					{
@@ -82,30 +105,6 @@ namespace PaLASOLU
 					};
 
 					lfuState.Uploaders.Add(uploaderCtx);
-
-					if (lfUploader_finded.generateAvatarMenu)
-					{
-						GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ParticleLiveSetup.basePrefabPath);
-						GameObject prefabInstance = PrefabUtility.InstantiatePrefab(basePrefab) as GameObject;
-						PrefabUtility.UnpackPrefabInstance(prefabInstance, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
-						prefabInstance.name = lfUploader_finded.gameObject.name + "_Base";
-						prefabInstance.transform.parent = ctx.AvatarRootTransform;
-
-						lfUploader_finded.transform.parent = prefabInstance.transform.Find("WorldFixed");
-
-						if (lfUploader_finded.disableOnPlayObject != null)
-						{
-							lfUploader_finded.disableOnPlayObject.transform.parent = prefabInstance.transform.Find("WorldFixed/DisableOnPlay");
-							GameObject defaultViewPosition = prefabInstance.transform.Find("WorldFixed/DisableOnPlay/ViewPosition").gameObject;
-							Object.DestroyImmediate(defaultViewPosition, true);
-						}
-
-						if (lfUploader_finded.localOnlyObject != null)
-						{
-							lfUploader_finded.localOnlyObject.transform.parent = prefabInstance.transform.Find("WorldFixed/LocalOnly");
-						}
-
-					}
 
 					lfUploader_finded.gameObject.name = "ParticleLive";
 				}
