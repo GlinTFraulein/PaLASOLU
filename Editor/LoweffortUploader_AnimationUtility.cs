@@ -30,7 +30,7 @@ namespace PaLASOLU
 			}
 		}
 
-		public static AnimationClip BakeAnimationTrackToMergedClip(TrackAsset track)
+		public static AnimationClip BakeAnimationTrackToMergedClip(TrackAsset track, BuildContext ctx)
 		{
 			if (track is not AnimationTrack animationTrack)
 			{
@@ -41,7 +41,7 @@ namespace PaLASOLU
 			TimelineClip[] timelineClips = animationTrack.GetClips().ToArray();
 			if (timelineClips.Length == 0)
 			{
-				LogMessageSimplifier.PaLog(1, $"{track.name} トラックには、アニメーションデータがありません！");
+				LogMessageSimplifier.PaLog(1, $"{track.name} トラックには、アニメーションデータがありません！", ctx);
 				return null;
 			}
 
@@ -66,7 +66,7 @@ namespace PaLASOLU
 				AnimationClip sourceClip = playableAsset.clip;
 				if (sourceClip == null)
 				{
-					LogMessageSimplifier.PaLog(1, $"TimelineClip {clip.displayName} に、 AnimationClip が設定されていません！");
+					LogMessageSimplifier.PaLog(1, $"TimelineClip {clip.displayName} に、 AnimationClip が設定されていません！", ctx);
 					continue;
 				}
 

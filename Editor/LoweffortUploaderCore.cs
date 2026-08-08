@@ -79,20 +79,20 @@ namespace PaLASOLU
 					PlayableDirector director_finded = lfUploader_finded.director;
 					if (director_finded == null)
 					{
-						LogMessageSimplifier.PaLog(2, $"{lfUploader_ObjectName} の PaLASOLU Low-effort Uploader に PlayableDirector コンポーネントが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、{lfUploader_ObjectName} GameObject の、 PaLASOLU Low-eoofrt Uploader コンポーネント内の、「高度な設定」から Playable Director がNoneでないことを確認してください。");
+						LogMessageSimplifier.PaLog(1, $"{lfUploader_ObjectName} の PaLASOLU Low-effort Uploader に PlayableDirector コンポーネントが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、{lfUploader_ObjectName} GameObject の、 PaLASOLU Low-eoofrt Uploader コンポーネント内の、「高度な設定」から Playable Director がNoneでないことを確認してください。", ctx);
 						continue;
 					}
 
 					TimelineAsset timeline_finded = lfUploader_finded.timeline;
 					if (timeline_finded == null)
 					{
-						LogMessageSimplifier.PaLog(2, $"{lfUploader_ObjectName} の PlayableDirector に Timeline Asset アセットが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、{lfUploader_ObjectName} GameObject の、 PlayableDirector コンポーネント内の、 Playable が None でないことを確認してください。");
+						LogMessageSimplifier.PaLog(1, $"{lfUploader_ObjectName} の PlayableDirector に Timeline Asset アセットが設定されていません！Low-effort Uploaderの処理はスキップされます。\nPaLASOLU Setup Optimization からセットアップを行った場合、{lfUploader_ObjectName} GameObject の、 PlayableDirector コンポーネント内の、 Playable が None でないことを確認してください。", ctx);
 						continue;
 					}
 
 					if (!seenTimelines.Add(timeline_finded))
 					{
-						LogMessageSimplifier.PaLog(1, $"Timeline {timeline_finded.name} は複数の LoweffortUploader から参照されています。 {lfUploader_finded.name} の処理はスキップされます。");
+						LogMessageSimplifier.PaLog(1, $"Timeline {timeline_finded.name} は複数の LoweffortUploader から参照されています。 {lfUploader_finded.name} の処理はスキップされます。", ctx);
 						continue;
 					}
 
@@ -117,7 +117,7 @@ namespace PaLASOLU
 						var animator = lfuCtx.director.GetGenericBinding(track) as Animator;
 						if (animator == null)
 						{
-							LogMessageSimplifier.PaLog(1, $"トラック {track.name} にAnimatorが設定されていません！Timelineが正しく再生されない可能性があります。");
+							LogMessageSimplifier.PaLog(1, $"トラック {track.name} にAnimatorが設定されていません！Timelineが正しく再生されない可能性があります。", ctx);
 							continue;
 						}
 						//animatorObjectは紐付けられているGameObjectを取る(AnimatorはNDMFで一度削除されるため)
@@ -172,7 +172,7 @@ namespace PaLASOLU
 
 					foreach (TrackAsset track in lfuCtx.timeline.GetOutputTracks())
 					{
-						ProcessTrack(track, processCtx);
+						ProcessTrack(track, processCtx, ctx);
 					}
 
 					//ParticleSystem Allow Roll Fix
@@ -265,12 +265,12 @@ namespace PaLASOLU
 			});
 		}
 
-		void ProcessTrack(TrackAsset track, ProcessContext processCtx)
+		void ProcessTrack(TrackAsset track, ProcessContext processCtx, BuildContext ctx)
 		{
 			//Track Group Handling
 			foreach (TrackAsset child in track.GetChildTracks())
 			{
-				ProcessTrack(child, processCtx);
+				ProcessTrack(child, processCtx, ctx);
 			}
 
 			if (track.muted) return;
@@ -282,10 +282,10 @@ namespace PaLASOLU
 			if (track is AnimationTrack)
 			{
 				AnimationClip sumOfClip = (track as AnimationTrack).infiniteClip;
-				if (sumOfClip == null) sumOfClip = BakeAnimationTrackToMergedClip(track);
+				if (sumOfClip == null) sumOfClip = BakeAnimationTrackToMergedClip(track, ctx);
 				if (!processCtx.bindings.TryGetValue(track.GetInstanceID(), out var clip) || clip == null)
 				{
-					LogMessageSimplifier.PaLog(1, $"{track.name} トラックに紐づく GameObject が見つかりません。");
+					LogMessageSimplifier.PaLog(1, $"{track.name} トラックに紐づく GameObject が見つかりません。", ctx);
 					return;
 				}
 
@@ -304,7 +304,7 @@ namespace PaLASOLU
 
 					if (audioClip == null)
 					{
-						LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} にオーディオクリップが存在しません。");
+						LogMessageSimplifier.PaLog(1, $"{nowClip.displayName} にオーディオクリップが存在しません。", ctx);
 						continue;
 					}
 
@@ -351,7 +351,7 @@ namespace PaLASOLU
 				GameObject activateObject = processCtx.director.GetGenericBinding(track) as GameObject;
 				if (activateObject == null)
 				{
-					LogMessageSimplifier.PaLog(1, $"{track.name} にGameObjectが存在しません。");
+					LogMessageSimplifier.PaLog(1, $"{track.name} にGameObjectが存在しません。", ctx);
 					return;
 				}
 
