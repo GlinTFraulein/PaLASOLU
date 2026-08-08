@@ -7,6 +7,13 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 
+## [2.5.0-b] - [2026-08-08]
+### 追加
+- NDMFコンソール対応
+
+### 修正
+- Low-effort Uploaderの動作順を修正し、Playable DirectorなしでもGenerate Avatar Menuが動作するように
+
 ## [2.5.0-a] - [2026-08-05]
 ### 追加
 - PPS Quick Setup
