@@ -7,6 +7,23 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 
+## [2.5.0] - [2026-08-09] - Welcome to UniMagic 8th Update!
+### 追加
+- PaLASOLU Particle Packを追加
+	- Tools/PaLASOLU/Extensions/Import PaLASOLU Particle Pack からインポートできます。
+	- 現在は30種類のパーティクルを提供しています。順次拡張予定であると同時に、パーティクルの提供も歓迎しています！
+- PostProcessing Quick Setupを追加
+	- Tools/PaLASOLU/Extensions/PostProcessing Quick Setup から、Scene上にPostProcessをワンクリックで設定できます。
+- Keyframe Counterを追加
+	- Tools/PaLASOLU/Extensions/Keyframe Counter から、AnimationClipやTimelineのキーフレーム数を数えることができます。
+	- @VRaiMV の貢献に感謝します！
+- NDMFコンソールに対応
+
+### 修正
+- Low-effort Uploaderの動作順を修正し、Playable DirectorなしでもGenerate Avatar Menuが動作するように
+- [#9] 一部の環境でLow-effort Uploaderがやたら遅かったのを修正
+- Sampleの.metaファイルを綺麗に
+
 ## [2.5.0-b] - [2026-08-08]
 ### 追加
 - NDMFコンソール対応
