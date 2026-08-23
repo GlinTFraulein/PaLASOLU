@@ -45,13 +45,13 @@ namespace PaLASOLU
 				isModified = true;
 
 				int startSample = Mathf.FloorToInt((float)startTime * frequency);
-				int sampleLength = Mathf.FloorToInt((float)(duration * timeScale) * frequency);
+				int sampleLength = Mathf.Min(Mathf.FloorToInt((float)(duration * timeScale) * frequency), samples - startSample);
 
 				float[] slicedData = new float[sampleLength * channels];
 				System.Array.Copy(data, startSample * channels, slicedData, 0, sampleLength * channels);
 
 				data = slicedData;
-				samples = data.Length / channels;
+				samples = sampleLength;
 			}
 
 			//SpeedClip
