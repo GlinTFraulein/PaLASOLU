@@ -7,6 +7,10 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 
+## [2.5.1] - [2026-08-23]
+### 修正
+- [#31] AudioClipよりもTimelineClipが長い場合にエラーになる不具合を修正
+
 ## [2.5.0] - [2026-08-09] - Welcome to UniMagic 8th Update!
 ### 追加
 - PaLASOLU Particle Packを追加
