@@ -26,6 +26,7 @@
 
 
 
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Timeline;
@@ -39,18 +40,22 @@ namespace PaLASOLU
 
 		// 閾値
 		const int T1 = 100;
-		const int T2 = 350;
+		const int T2 = 300;
 		const int T3 = 1000;
-		const int T4 = 3500;
+		const int T4 = 3000;
 		const int T5 = 10000;
+		const int T6 = 30000;
+		const int T7 = 100000;
 
 		// セリフ（自由に編集可）
 		[SerializeField, TextArea(1, 3)] string line_lt100 = "まだまだこれから！";
-		[SerializeField, TextArea(1, 3)] string line_lt350 = "いい感じ！この調子で製作を進めてみてね！";
+		[SerializeField, TextArea(1, 3)] string line_lt300 = "いい感じ！この調子で製作を進めてみてね！";
 		[SerializeField, TextArea(1, 3)] string line_lt1000 = "なかなかすごい！";
-		[SerializeField, TextArea(1, 3)] string line_lt3500 = "パーティクルメインで演出しているすごい人達だと、だいたいこれくらいのキーフレーム数になるそうです。";
+		[SerializeField, TextArea(1, 3)] string line_lt3000 = "パーティクルメインで演出しているすごい人達だと、だいたいこれくらいのキーフレーム数になるそうです。";
 		[SerializeField, TextArea(1, 3)] string line_lt10000 = "PaLASOLUの作者です。一度そのパーティクルライブを見せてくれませんか？？";
-		[SerializeField, TextArea(1, 3)] string line_ge10000 = "異常！！！！！\n(もしこれが出て、バグっぽい場合は、報告していただけると助かります。そのレベルのキーフレーム数です……。)";
+		[SerializeField, TextArea(1, 3)] string line_lt30000 = "あなたは最強です。オブジェクトメインで演出しているすごい人たちだと、だいたいこれくらいのキーフレームになると思います。裏取りはありませんが……。";
+		[SerializeField, TextArea(1, 3)] string line_lt100000 = "前バージョンではこれくらいのキーフレーム数で「異常！！！！！」ということにしていましたが、意外と出せるらしいです。何故なのか。";
+		[SerializeField, TextArea(1, 3)] string line_ge100000 = "本当に異常！！！！！何をしたんですか？？？？？\n(もしこれが出て、バグっぽい場合は、報告していただけると助かります。そのレベルのキーフレーム数です……。)";
 
 		[MenuItem("Tools/PaLASOLU/Extensions/Keyframe Counter", priority = 321)]
 		static void Open() => GetWindow<KeyframeCounter>(toolName);
@@ -106,17 +111,114 @@ namespace PaLASOLU
 		{
 			int total = 0;
 
-			// 数値カーブ
-			foreach (var b in AnimationUtility.GetCurveBindings(c))
+			// Transform以外の通常カーブ
+			Dictionary<string, HashSet<float>> otherCurveKeys = new Dictionary<string, HashSet<float>>();
+
+			// Transform用
+			Dictionary<string, HashSet<float>> transformPositionKeys = new Dictionary<string, HashSet<float>>();
+			Dictionary<string, HashSet<float>> transformRotationKeys = new Dictionary<string, HashSet<float>>();
+			Dictionary<string, HashSet<float>> transformScaleKeys = new Dictionary<string, HashSet<float>>();
+
+			foreach (EditorCurveBinding binding in AnimationUtility.GetCurveBindings(c))
 			{
-				var curve = AnimationUtility.GetEditorCurve(c, b);
-				if (curve != null) total += curve.keys.Length;
+				AnimationCurve curve = AnimationUtility.GetEditorCurve(c, binding);
+				if (curve == null) continue;
+
+				bool isTransform = binding.type == typeof(Transform);
+
+				if (!isTransform)
+				{
+					string key = $"{binding.path}|{binding.propertyName}";
+
+					if (!otherCurveKeys.TryGetValue(key, out HashSet<float> times))
+					{
+						times = new HashSet<float>();
+						otherCurveKeys.Add(key, times);
+					}
+
+					foreach (Keyframe keyframe in curve.keys)
+					{
+						times.Add(keyframe.time);
+					}
+
+					continue;
+				}
+
+				Dictionary<string, HashSet<float>> target;
+
+				if (binding.propertyName.StartsWith("m_LocalPosition."))
+				{
+					target = transformPositionKeys;
+				}
+				else if (binding.propertyName.StartsWith("m_LocalRotation."))
+				{
+					target = transformRotationKeys;
+				}
+				else if (binding.propertyName.StartsWith("m_LocalScale."))
+				{
+					target = transformScaleKeys;
+				}
+				else
+				{
+					// Position / Rotation / Scale以外のTransformカーブ
+					string key = $"{binding.path}|{binding.propertyName}";
+
+					if (!otherCurveKeys.TryGetValue(key, out HashSet<float> times))
+					{
+						times = new HashSet<float>();
+						otherCurveKeys.Add(key, times);
+					}
+
+					foreach (Keyframe keyframe in curve.keys)
+					{
+						times.Add(keyframe.time);
+					}
+
+					continue;
+				}
+
+				// TransformのPosition / Rotation / ScaleはX,Y,Z等をまとめて時刻単位でカウント
+				string transformPath = binding.path;
+
+				if (!target.TryGetValue(transformPath, out HashSet<float> transformTimes))
+				{
+					transformTimes = new HashSet<float>();
+					target.Add(transformPath, transformTimes);
+				}
+
+				foreach (Keyframe keyframe in curve.keys)
+				{
+					transformTimes.Add(keyframe.time);
+				}
 			}
 
-			// オブジェクト参照カーブ（Sprite切替など）
-			foreach (var b in AnimationUtility.GetObjectReferenceCurveBindings(c))
+			// Transform以外
+			foreach (KeyValuePair<string, HashSet<float>> pair in otherCurveKeys)
 			{
-				var keys = AnimationUtility.GetObjectReferenceCurve(c, b);
+				total += pair.Value.Count;
+			}
+
+			// Position / Rotation / Scale
+			foreach (KeyValuePair<string, HashSet<float>> pair in transformPositionKeys)
+			{
+				total += pair.Value.Count;
+			}
+
+			foreach (KeyValuePair<string, HashSet<float>> pair in transformRotationKeys)
+			{
+				total += pair.Value.Count;
+			}
+
+			foreach (KeyValuePair<string, HashSet<float>> pair in transformScaleKeys)
+			{
+				total += pair.Value.Count;
+			}
+
+			// オブジェクト参照カーブ
+			foreach (EditorCurveBinding binding in AnimationUtility.GetObjectReferenceCurveBindings(c))
+			{
+				ObjectReferenceKeyframe[] keys = AnimationUtility.GetObjectReferenceCurve(c, binding);
+
 				if (keys != null) total += keys.Length;
 			}
 
@@ -159,11 +261,13 @@ namespace PaLASOLU
 		string PickLine(int total)
 		{
 			if (total < T1) return line_lt100;
-			if (total < T2) return line_lt350;
+			if (total < T2) return line_lt300;
 			if (total < T3) return line_lt1000;
-			if (total < T4) return line_lt3500;
+			if (total < T4) return line_lt3000;
 			if (total < T5) return line_lt10000;
-			return line_ge10000;
+			if (total < T6) return line_lt30000;
+			if (total < T7) return line_lt100000;
+			return line_ge100000;
 		}
 	}
 }
