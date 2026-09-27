@@ -311,12 +311,20 @@ namespace PaLASOLU
 					//Audio Modify - 何もしない場合はメソッド側でそのままaudioClipを返す
 					audioClip = ModifyClip(audioClip, nowClip, processCtx.timeline);
 
+					string audioClipPath = AssetDatabase.GetAssetPath(audioClip);
+					AudioImporter audioImporter = AssetImporter.GetAtPath(audioClipPath) as AudioImporter;
+					AudioImporterSampleSettings audioSampleSettings = audioImporter.defaultSampleSettings;
+
 					if (audioClip.loadInBackground == false)
 					{
-						string audioClipPath = AssetDatabase.GetAssetPath(audioClip);
-						AudioImporter audioImporter = AssetImporter.GetAtPath(audioClipPath) as AudioImporter;
 						audioImporter.loadInBackground = true;
 						audioImporter.SaveAndReimport();
+					}
+
+					if (audioClip.loadType != AudioClipLoadType.Streaming)
+					{
+						audioSampleSettings.loadType = AudioClipLoadType.Streaming;
+						audioImporter.defaultSampleSettings = audioSampleSettings;
 					}
 
 					string uniqueName = FileAndPathEditExtension.SetUniqueName(audioClip.name);
