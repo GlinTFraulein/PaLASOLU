@@ -7,6 +7,13 @@ PaLASOLUの主な変更点をこのファイルで記録しています。
 ## [Unreleased & Planned]
 https://github.com/GlinTFraulein/PaLASOLU/issues に移動しました。
 
+## [2.5.2] - [2026-09-27]
+### 修正
+- Keyframe Counterが一部のキーフレームを3倍多くカウントしていた不具合を修正
+- パーティクルライブの初回再生時に、演出と音がズレる不具合を修正
+	- 修正の適用のために再アップロードが必要です！
+	- 技術的な詳細 : audioImporterのloadTypeを、Streamingにしました。そのため、音ズレを防止した分の負荷は再生中のCPU負荷に転嫁されます。
+
 ## [2.5.1] - [2026-08-23]
 ### 修正
 - [#31] AudioClipよりもTimelineClipが長い場合にエラーになる不具合を修正
